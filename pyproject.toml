@@ -44,11 +44,28 @@ Documentation = "https://github.com/RicardoA-Salgado/osintote#readme"
 Issues = "https://github.com/RicardoA-Salgado/osintote/issues"
 Source = "https://github.com/RicardoA-Salgado/osintote"
 
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.0.0",
+  "ruff>=0.9.0",
+  "pytest>=8.0.0",
+  "pytest-asyncio>=0.25.0",
+  "httpx>=0.28.0",
+  "coverage[toml]>=7.0.0",
+]
+docs = [
+  "jinja2>=3.1.0",
+]
+
 [project.scripts]
 osintote = "osintote.cli:main"
 
 [tool.hatch.version]
 path = "src/osintote/__about__.py"
+
+[tool.hatch.build]
+include = ["src/osintote"]
+exclude = ["*.bak", "*.pyc", "__pycache__"]
 
 [tool.hatch.envs.default]
 dependencies = [

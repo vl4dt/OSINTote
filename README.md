@@ -1,42 +1,104 @@
-# sv
+# OSINTote
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+**Ultimate OSINT tool** with AI-powered analysis, CLI + Web UI.
 
-## Creating a project
+> A comprehensive open-source OSINT framework with SQLite-backed task management, automated recon, and intelligent analysis.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## 🚀 Quick Start
 
-```sh
-# create a new project
-npx sv create my-app
+```bash
+# Install
+pip install osintote
+
+# Initialize
+osintote init
+
+# Start web server
+osintote serve
+
+# Or CLI mode
+osintote status
 ```
 
-To recreate this project with the same configuration:
+## ✨ Features
 
-```sh
-# recreate this project
-npx sv@0.15.3 create --template demo --types ts --install npm C:/Users/vl4dt/AppData/Local/Temp/svelte-app
+- **CLI + Web UI** — Full-featured terminal interface and responsive web dashboard
+- **AI-Powered Analysis** — Provider-agnostic AI (Ollama, LM Studio, OpenAI, vLLM) for intelligent findings
+- **Automated Recon** — DNS enumeration, HTTP probing, port scanning, WHOIS, Shodan, VirusTotal, Nuclei
+- **SQLite Backend** — Write-ahead logging with auto-migrations and crash recovery
+- **Recipe System** — JSON-based recon workflows with dependency-ordered stages
+- **Real-time Progress** — SSE streaming for live task updates
+- **Multi-Source Integration** — Pluggable engine architecture for 10+ OSINT sources
+
+## 📦 Installation
+
+```bash
+# From PyPI
+pip install osintote
+
+# From source
+git clone https://github.com/RicardoA-Salgado/osintote.git
+cd osintote
+pip install -e .
 ```
 
-## Developing
+### Prerequisites
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- Python 3.14+
+- Node.js 20+ (for web UI development)
 
-```sh
-npm run dev
+## 📖 Documentation
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+- [Getting Started](docs/getting-started.md)
+- [CLI Reference](docs/cli-reference.md)
+- [Web UI Guide](docs/web-ui-guide.md)
+- [API Reference](docs/api-reference.md)
+- [Built-in Recipes](docs/recipes/built-in.md)
+- [Custom Recipes](docs/recipes/custom.md)
+- [Security](docs/security.md)
+- [FAQ](docs/faq.md)
+
+## 🏗 Architecture
+
+```
+osintote/
+├── cli/           # CLI commands (typer)
+├── api/           # FastAPI web server
+├── engine/        # OSINT engine + stage strategies
+├── models/        # ORM models + database layer
+├── workers/       # Background task executor
+├── recipes/       # Built-in recon recipes
+├── reports/       # Report generation service
+└── tests/         # Test suite
 ```
 
-## Building
+## 🔧 Development
 
-To create a production version of your app:
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
 
-```sh
-npm run build
+# Run tests
+pytest
+
+# Lint and format
+ruff check
+ruff format
+
+# Type checking
+mypy src/osintote
 ```
 
-You can preview the production build with `npm run preview`.
+## 📄 License
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+MIT License — see [LICENSE](LICENSE.txt) for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+## 🔗 Links
+
+- [GitHub](https://github.com/RicardoA-Salgado/osintote)
+- [Issues](https://github.com/RicardoA-Salgado/osintote/issues)
+- [Documentation](https://github.com/RicardoA-Salgado/osintote#readme)

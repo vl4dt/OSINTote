@@ -4,6 +4,6 @@
 import sys
 
 if __name__ == "__main__":
-    from osintote.cli import osintote
+    from osintote.cli import main
 
-    sys.exit(osintote())
+    main()
