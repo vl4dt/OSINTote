@@ -1,33 +1,31 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+.frontend/node_modules/
 
-# Beads / Dolt files (added by bd init)
-.dolt/
-*.db
-.beads-credential-key
+# Build output
+dist/
+frontend/.output/
+frontend/.svelte-kit/
 
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.osintote/
 *.egg-info/
-dist/
-build/
-*.egg
 .eggs/
 
-# Virtual environments
-.venv/
-venv/
-ENV/
-env/
+# OS
+.DS_Store
+Thumbs.db
 
-# OSINTote
-.osintote/
-*.db
-*.sqlite3
-
-# Node
-frontend/node_modules/
-frontend/.svelte-kit/
-frontend/build/
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
 
 # IDE
 .vscode/
@@ -36,13 +34,31 @@ frontend/build/
 *.swo
 *~
 
-# OS
-.DS_Store
-Thumbs.db
+# IDE - vscode
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 
-# Logs
-*.log
-logs/
+# Beads
+.beads/embeddeddolt/
+.beads/.local_version
+.beads/interactions.jsonl
+.beads/last-touched
+.beads/export-state.json
+.beads/metadata.json
+.beads/config.yaml
 
-# Docker
-docker-compose.override.yml
+# OSINTote database
+osintote.db
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# alembic
+alembic/versions/__pycache__/
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*

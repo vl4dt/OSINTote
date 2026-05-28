@@ -1,0 +1,104 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "osintote"
+dynamic = ["version"]
+description = "Ultimate OSINT tool with AI-powered analysis, CLI + Web UI"
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+keywords = ["osint", "intelligence", "security", " reconnaissance"]
+authors = [
+  { name = "Ricardo A. Salgado", email = "ricr.sb@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Implementation :: CPython",
+]
+dependencies = [
+  "fastapi>=0.136.0",
+  "uvicorn[standard]>=0.48.0",
+  "pydantic>=2.13.0",
+  "pydantic-settings>=2.14.0",
+  "sqlalchemy>=2.0.50",
+  "sqlmodel>=0.0.38",
+  "alembic>=1.18.0",
+  "aiosqlite>=0.22.0",
+  "typer>=0.26.0",
+  "rich>=15.0.0",
+  "httpx>=0.28.0",
+  "dnspython>=2.8.0",
+  "python-whois>=0.9.0",
+  "passlib[bcrypt]>=1.7.4",
+  "jinja2>=3.1.0",
+  "aiofiles>=25.1.0",
+  "python-dotenv>=1.2.0",
+]
+
+[project.urls]
+Documentation = "https://github.com/RicardoA-Salgado/osintote#readme"
+Issues = "https://github.com/RicardoA-Salgado/osintote/issues"
+Source = "https://github.com/RicardoA-Salgado/osintote"
+
+[project.scripts]
+osintote = "osintote.cli:main"
+
+[tool.hatch.version]
+path = "src/osintote/__about__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+  "mypy>=1.0.0",
+  "ruff>=0.9.0",
+  "pytest>=8.0.0",
+  "pytest-asyncio>=0.25.0",
+  "httpx>=0.28.0",
+  "coverage[toml]>=7.0.0",
+]
+
+[tool.hatch.envs.default.scripts]
+check = "mypy --ignore-missing-imports {args:src/osintote}"
+lint = "ruff check {args:src/osintote}"
+fmt = "ruff format {args:src/osintote}"
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+test-cov-report = [
+  "coverage report",
+  "coverage html",
+]
+
+[tool.coverage.run]
+source_pkgs = ["osintote"]
+branch = true
+parallel = true
+omit = [
+  "src/osintote/__about__.py",
+]
+
+[tool.coverage.paths]
+osintote = ["src/osintote", "*/osintote/src/osintote"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+show_missing = true
+fail_under = 80
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.14"
+ignore_missing_imports = true
+strict = true
