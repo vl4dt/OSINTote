@@ -5,7 +5,7 @@
 ## Summary
 
 ```
-OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  35/57 (61%) | 22 remaining | 0 blocked
+OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  36/57 (63%) | 22 remaining | 0 blocked
 ```
 
 | Epic | Status | Done/Total | % |
@@ -13,7 +13,7 @@ OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  35/57
 | **Foundation (enz)** | COMPLETE | 8/8 | 100% |
 | **Pipeline & Engine (yk2)** | COMPLETE | 12/12 | 100% |
 | **Polish & Ship (35e)** | IN PROGRESS | 12/13 | 92% |
-| **Data Sources (jcz)** | IN PROGRESS | 1/12 | 8% |
+| **Data Sources (jcz)** | IN PROGRESS | 2/13 | 15% |
 | **Intelligence & AI (2yq)** | IN PROGRESS | 1/9 | 11% |
 
 ---
@@ -74,7 +74,7 @@ OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  35/57
 
 ---
 
-## Data Sources (jcz) — 0/13 (0%)
+## Data Sources (jcz) — 2/13 (15%)
 
 | Status | ID | Description |
 |--------|----|-------------|
@@ -83,7 +83,7 @@ OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  35/57
 | **o** | OSINTote-jcz.2 | nmap wrapper — port scanning (-Pn -sV -T timing -p ports), XML output, async subprocess |
 | ✓ | OSINTote-jcz.3 | HTTP probing stage — httpx alive host discovery, timeout, status code filtering, response headers capture (server, CSP, HSTS, content-type) |
 | **o** | OSINTote-jcz.4 | VirusTotal API source — httpx API calls, rate limiting (4/min), malware classification |
-| **o** | OSINTote-jcz.5 | CLI wrapper framework — async subprocess (asyncio.create_subprocess_exec), output capture, timeout handling |
+| ✓ | OSINTote-jcz.5 | CLI wrapper framework — SubprocessRunner (asyncio.create_subprocess_exec, no shell=True), timeouts, memory/CPU limits, work dir isolation, env isolation, run/run_safe API, 19 unit tests |
 | **o** | OSINTote-jcz.6 | subfinder wrapper — subdomain enumeration via passive sources, output parsing |
 | **o** | OSINTote-jcz.7 | nuclei wrapper — vulnerability scanning (severity filter, template selection) |
 | **o** | OSINTote-jcz.8 | API key management — encrypted storage (AES-256 in SQLite), primary/fallback selection, usage tracking |
@@ -120,14 +120,17 @@ OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  35/57
 ## Recommended Next Steps
 
 1. **35e.6** (Final Integration) — ✓ COMPLETE. E2E test, CHANGELOG v0.1.0, reporter fix.
-2. **jcz.5** (CLI wrapper framework) — unblocks jcz.1, jcz.2, jcz.6, jcz.7
+2. **jcz.5** (CLI wrapper framework) — ✓ COMPLETE. SubprocessRunner for safe async CLI execution.
+3. **jcz.2** (nmap wrapper) — unblocked by jcz.5, uses CLI wrapper framework
+4. **jcz.6** (subfinder wrapper) — unblocked by jcz.5
+5. **jcz.7** (nuclei wrapper) — unblocked by jcz.5
 3. **jcz.9** (Target normalization) — unblocks jcz.1, jcz.3, 2yq.4
 4. **jcz.1** (DNS enumeration) — first concrete data source
 5. **2yq.8** (AI analysis) — requires 2yq.7 (context pruning) first
 
 ## Test Status
 
-- **335 tests passing**, 2 skipped, 2 warnings
+- **354 tests passing**, 2 skipped, 2 warnings
 - Coverage across: engine (executor, stage, wal), CLI, API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming, HTTP probe, error handling, recipes, reports, recon display
 
 ## Code Quality
