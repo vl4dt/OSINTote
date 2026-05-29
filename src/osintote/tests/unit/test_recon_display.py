@@ -2,12 +2,8 @@
 # SPDX-License-Identifier: MIT
 """Tests for CLI recon display."""
 
-import time
-
 from osintote.cli.commands.recon import ReconDisplay
 from osintote.engine.executor import ExecutionEvent
-from osintote.engine.stage import StageContext
-from osintote.models.orm import TaskStatus
 
 
 class TestReconDisplayStageManagement:
@@ -62,14 +58,18 @@ class TestReconDisplayFindingsAndErrors:
     def test_add_finding_ok(self) -> None:
         """Test adding an OK finding."""
         display = ReconDisplay()
-        display.add_finding({"type": "dns", "target": "example.com", "detail": "1.2.3.4", "status": "ok"})
+        display.add_finding(
+            {"type": "dns", "target": "example.com", "detail": "1.2.3.4", "status": "ok"}
+        )
         assert len(display.findings) == 1
         assert display.findings[0]["type"] == "dns"
 
     def test_add_finding_warning(self) -> None:
         """Test adding a warning finding."""
         display = ReconDisplay()
-        display.add_finding({"type": "http", "target": "test.org", "detail": "404", "status": "warning"})
+        display.add_finding(
+            {"type": "http", "target": "test.org", "detail": "404", "status": "warning"}
+        )
         assert display.findings[0]["status"] == "warning"
 
     def test_add_error(self) -> None:
@@ -191,8 +191,12 @@ class TestReconDisplayRendering:
     def test_render_findings_table(self) -> None:
         """Test findings table rendering."""
         display = ReconDisplay()
-        display.add_finding({"type": "dns", "target": "example.com", "detail": "1.2.3.4", "status": "ok"})
-        display.add_finding({"type": "http", "target": "test.org", "detail": "404", "status": "warning"})
+        display.add_finding(
+            {"type": "dns", "target": "example.com", "detail": "1.2.3.4", "status": "ok"}
+        )
+        display.add_finding(
+            {"type": "http", "target": "test.org", "detail": "404", "status": "warning"}
+        )
 
         table = display._render_findings_table()
         assert table is not None
