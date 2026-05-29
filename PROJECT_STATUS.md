@@ -5,13 +5,13 @@
 ## Summary
 
 ```
-OVERALL  [++++++++++++++++++++++++++++++-------------------------------]  32/57 (56%) | 25 remaining | 0 blocked
+OVERALL  [++++++++++++++++++++++++++++++++++++------------------------------]  34/57 (60%) | 23 remaining | 0 blocked
 ```
 
 | Epic | Status | Done/Total | % |
 |------|--------|-----------|---|
 | **Foundation (enz)** | COMPLETE | 8/8 | 100% |
-| **Pipeline & Engine (yk2)** | IN PROGRESS | 10/12 | 83% |
+| **Pipeline & Engine (yk2)** | COMPLETE | 12/12 | 100% |
 | **Polish & Ship (35e)** | IN PROGRESS | 11/12 | 92% |
 | **Data Sources (jcz)** | IN PROGRESS | 1/12 | 8% |
 | **Intelligence & AI (2yq)** | IN PROGRESS | 1/8 | 12% |
@@ -34,7 +34,7 @@ OVERALL  [++++++++++++++++++++++++++++++-------------------------------]  32/57 
 
 ---
 
-## Pipeline & Engine (yk2) — 7/13 (53%)
+## Pipeline & Engine (yk2) — COMPLETE ✓
 
 | Status | ID | Description |
 |--------|----|-------------|
@@ -47,7 +47,7 @@ OVERALL  [++++++++++++++++++++++++++++++-------------------------------]  32/57 
 | ✓ | OSINTote-yk2.6 | Results table UI — /results page (right panel), filterable/sortable table, severity/type filtering, ResultRow/ResultDetail |
 | ✓ | OSINTote-yk2.7 | Web UI shell — SvelteKit 2.61.1 project setup, dark OSINT theme (GitHub Dark), 3-panel layout (nav/sidebar/content), Panel/TabNav components |
 | ✓ | OSINTote-yk2.9 | Target management UI — /targets page, add/list/remove/show forms, lazy-loaded routes, TargetDialog/TargetDetail |
-| **o** | OSINTote-yk2.8 | Write-ahead log — WriteAhead buffer class, periodic checkpoint (5s), crash recovery |
+| ✓ | OSINTote-yk2.8 | Write-ahead log — WriteAhead buffer class, periodic checkpoint (5s), crash recovery |
 | ✓ | OSINTote-yk2.10 | Recipe system — JSON recipe config (name, description, stages array), bundled defaults (quick-scan, full-scan, passive-only), topological sorting, CLI commands |
 | ✓ | OSINTote-yk2.11 | Error handling framework — severity tiers (info→toast, warning→toast+banner, error→banner+log, critical→banner+log+notif), Error model, /api/errors, SSE error stream |
 | ✓ | OSINTote-yk2.12 | CLI progress display — rich terminal output (live progress bars, colored findings ✓/!/✗, scrollable log, summary panel), integrated with Executor engine |
@@ -113,23 +113,22 @@ OVERALL  [++++++++++++++++++++++++++++++-------------------------------]  32/57 
 ## Key Dependencies
 
 ```
-35e.6 (Final Integration) ─── blocked by ──► yk2.3 ✓, yk2.7 ✓, yk2.10 ✓, yk2.11 ✓, yk2.12 ✓, jcz.3 ✓, 2yq.3 ✓, enz.5 ✓
+35e.6 (Final Integration) ─── blocked by ──► yk2.3 ✓, yk2.7 ✓, yk2.8 ✓, yk2.10 ✓, yk2.11 ✓, yk2.12 ✓, jcz.3 ✓, 2yq.3 ✓, enz.5 ✓
 2yq.1 (AI Provider) ─── blocked by ──► enz.1 ✓
 ```
 
 ## Recommended Next Steps
 
-1. **yk2.8** (Write-ahead log) — engine durability foundation, completes Pipeline & Engine epic
-2. **35e.6** (Final Integration) — all dependencies now unblocked! Demo the full pipeline.
-3. **jcz.1** (DNS enumeration) — first concrete data source
-4. **jcz.5** (CLI wrapper framework) — unblocks jcz.1, jcz.2, jcz.6, jcz.7
-5. **jcz.9** (Target normalization) — unblocks jcz.1, jcz.3, 2yq.4
-6. **2yq.8** (AI analysis) — requires 2yq.7 (context pruning) first
+1. **35e.6** (Final Integration) — **all dependencies now unblocked!** Pipeline & Engine epic complete. Demo the full pipeline.
+2. **jcz.5** (CLI wrapper framework) — unblocks jcz.1, jcz.2, jcz.6, jcz.7
+3. **jcz.9** (Target normalization) — unblocks jcz.1, jcz.3, 2yq.4
+4. **jcz.1** (DNS enumeration) — first concrete data source
+5. **2yq.8** (AI analysis) — requires 2yq.7 (context pruning) first
 
 ## Test Status
 
-- **272 tests passing**, 2 skipped, 2 warnings
-- Coverage across: engine, CLI, API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming, HTTP probe, error handling, recipes, reports
+- **332 tests passing**, 2 skipped, 2 warnings
+- Coverage across: engine (executor, stage, wal), CLI, API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming, HTTP probe, error handling, recipes, reports, recon display
 
 ## Code Quality
 
