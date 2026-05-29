@@ -4,8 +4,17 @@
 
 Auto-discovers and registers stage implementations:
     - http_probe: HTTP alive host discovery
+    - nmap: port scanning
+    - subfinder: subdomain enumeration
+    - nuclei: vulnerability scanning
+    - normalizer: target normalisation & deduplication
 """
 
-from osintote.workers import http_probe
+from osintote.workers import http_probe, nmap, normalizer, nuclei, subfinder
 
-__all__ = ["http_probe"]
+# Auto-register all stages
+nmap.__register__()
+nuclei.__register__()
+subfinder.__register__()
+
+__all__ = ["http_probe", "nmap", "normalizer", "nuclei", "subfinder"]

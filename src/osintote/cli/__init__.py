@@ -14,6 +14,7 @@ from osintote.cli.commands import recipes as recipes_app
 from osintote.cli.commands import recon as recon_app
 from osintote.cli.commands import settings as settings_app
 from osintote.cli.commands import tasks as tasks_app
+from osintote.cli.commands import webhooks as webhook_app
 
 app = Typer(
     name="osintote",
@@ -251,6 +252,7 @@ app.add_typer(recon_app.app, name="recon")
 app.add_typer(recipes_app.app, name="recipes")
 app.add_typer(settings_app._app, name="settings")
 app.add_typer(tasks_app.app, name="tasks")
+app.add_typer(webhook_app.webhook_app, name="webhook")
 
 
 def main() -> None:

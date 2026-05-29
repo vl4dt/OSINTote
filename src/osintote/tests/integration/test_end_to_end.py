@@ -90,9 +90,7 @@ def test_full_pipeline(db_session: Session) -> None:
     # Step 1: Create target
     from osintote.models.orm import Target
 
-    db_session.add(
-        Target(name="example.com", type="domain", description="E2E test target")
-    )
+    db_session.add(Target(name="example.com", type="domain", description="E2E test target"))
     db_session.commit()
 
     # Step 2: Create task
