@@ -87,7 +87,6 @@ class MarkdownExporter:
     def _render_summary_section(self) -> str:
         """Render findings summary as a Markdown table."""
         records = self.data.get("records", [])
-        metadata = self.data.get("metadata", {})
 
         # Count by type
         type_counts: dict[str, int] = {}
@@ -107,7 +106,6 @@ class MarkdownExporter:
 
     def _render_risk_score(self) -> str:
         """Calculate and render risk score."""
-        records = self.data.get("records", [])
         metadata = self.data.get("metadata", {})
         record_types = metadata.get("record_types", [])
 
@@ -146,8 +144,7 @@ class MarkdownExporter:
             )
         else:
             lines.append(
-                "> ✅ **LOW RISK**: Minimal exposure detected. "
-                "Continue standard monitoring."
+                "> ✅ **LOW RISK**: Minimal exposure detected. Continue standard monitoring."
             )
         return "\n".join(lines)
 

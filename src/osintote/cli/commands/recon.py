@@ -5,27 +5,34 @@
 Subcommands:
     start  — Run a task with live progress bars, colored findings, and summary
     list   — List tasks with status indicators
+
+Features:
+    - Live progress bars per stage with spinner animation
+    - Colored findings (✓/!/✗) with type, target, and details
+    - Scrollable log panel showing last N entries
+    - Summary panel with stage stats, findings count, and error count
 """
 
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
+import time
+from dataclasses import dataclass, field
+from typing import Any
 
 import typer
-from rich.console import Console
+from rich.console import Console, Group
+from rich.live import Live
 from rich.panel import Panel
 from rich.progress import (
-    BarColumn,
     Progress,
-    SpinnerColumn,
-    TextColumn,
-    TimeRemainingColumn,
 )
+from rich.rule import Rule
 from rich.table import Table
 from sqlmodel import Session, select
 
+from osintote.engine.executor import ExecutionEvent, Executor
 from osintote.engine.stage import STAGE_REGISTRY, FakeStage, Stage
 from osintote.models.database import get_session
 from osintote.models.orm import Target, Task, TaskCreate, TaskStatus
@@ -37,174 +44,312 @@ console = Console()
 app = typer.Typer(help="Recon execution commands")
 
 
-# ── Live Progress Display ──────────────────────────────────────────────────
+# ── Stage State ─────────────────────────────────────────────────────────────
+
+
+@dataclass
+class StageState:
+    """Per-stage execution state for display."""
+
+    name: str
+    total: int = 0
+    completed: int = 0
+    success: bool = False
+    error: str | None = None
+    elapsed_ms: float = 0.0
+    records: list[dict[str, Any]] = field(default_factory=list)
+
+
+# ── Live Progress Display ───────────────────────────────────────────────────
 
 
 class ReconDisplay:
-    """Rich terminal display for recon task progress."""
+    """Rich terminal display for recon task progress.
+
+    Renders:
+        - Stage progress bars with per-stage spinners
+        - Findings table (✓/!/✗ icons by severity)
+        - Error table with stage and message
+        - Scrollable log panel (last 50 lines)
+        - Summary panel with stats
+    """
 
     def __init__(self) -> None:
-        self.progress = Progress(
-            SpinnerColumn(),
-            TextColumn("[bold blue]{task.description}"),
-            BarColumn(),
-            TextColumn("[progress.percentage]{task.percentage:>5.1f}%"),
-            TimeRemainingColumn(),
-            console=console,
-            transient=False,
-        )
-        self.stage_tasks: dict[str, int] = {}
-        self.findings: list[dict] = []
-        self.errors: list[dict] = []
+        self.stages: dict[str, StageState] = {}
+        self.findings: list[dict[str, str]] = []
+        self.errors: list[dict[str, str]] = []
         self.log_lines: list[str] = []
+        self._start_time: float = time.time()
+        self._progress: Progress | None = None
+        self._stage_task_ids: dict[str, int] = {}
 
-    def start(self) -> None:
-        """Start the progress display."""
-        self.progress.start()
-        console.print()
+    @property
+    def elapsed_seconds(self) -> float:
+        """Total elapsed time in seconds."""
+        return time.time() - self._start_time
 
-    def add_stage(self, stage_name: str, total: int = 1) -> str:
-        """Add a stage task and return its progress task ID."""
-        stage_id = self.progress.add_task(
-            description=stage_name,
-            total=total,
-            visible=True,
-        )
-        self.stage_tasks[stage_name] = stage_id
-        return str(stage_id)
+    # ── Stage management ───────────────────────────────────────────────
 
-    def update_stage(self, stage_name: str, advance: int = 1, **kwargs) -> None:
-        """Advance a stage's progress."""
-        if stage_name in self.stage_tasks:
-            self.progress.update(
-                self.stage_tasks[stage_name],
-                advance=advance,
-                **kwargs,
+    def add_stage(self, stage_name: str, total: int = 1) -> None:
+        """Register a new stage for tracking."""
+        self.stages[stage_name] = StageState(name=stage_name, total=total)
+
+    def update_stage(
+        self, stage_name: str, completed: int = 0, success: bool = True, elapsed_ms: float = 0.0
+    ) -> None:
+        """Update a stage's progress state."""
+        if stage_name in self.stages:
+            stage = self.stages[stage_name]
+            stage.completed = completed
+            stage.success = success
+            stage.elapsed_ms = elapsed_ms
+
+    def complete_stage(
+        self, stage_name: str, success: bool = True, elapsed_ms: float = 0.0
+    ) -> None:
+        """Mark a stage as completed (total = completed)."""
+        if stage_name in self.stages:
+            self.update_stage(
+                stage_name,
+                completed=self.stages[stage_name].total,
+                success=success,
+                elapsed_ms=elapsed_ms,
             )
 
-    def mark_stage_complete(self, stage_name: str, completed: bool = True) -> None:
-        """Mark a stage as completed."""
-        if stage_name in self.stage_tasks:
-            self.progress.update(
-                self.stage_tasks[stage_name],
-                completed=completed,
-            )
+    def fail_stage(self, stage_name: str, error: str) -> None:
+        """Mark a stage as failed."""
+        if stage_name in self.stages:
+            self.stages[stage_name].success = False
+            self.stages[stage_name].error = error
 
-    def add_finding(self, finding: dict) -> None:
-        """Add a colored finding to the results."""
+    # ── Findings and errors ────────────────────────────────────────────
+
+    def add_finding(self, finding: dict[str, str]) -> None:
+        """Add a colored finding. Status: ok→✓, warning→!, error→✗."""
         self.findings.append(finding)
 
-    def add_error(self, error: dict) -> None:
+    def add_error(self, stage: str, message: str) -> None:
         """Add an error entry."""
-        self.errors.append(error)
+        self.errors.append({"stage": stage, "message": message})
 
     def add_log(self, message: str) -> None:
         """Add a log line."""
         self.log_lines.append(message)
 
-    def render_summary(self) -> None:
-        """Render a summary panel with findings, errors, and stats."""
-        console.print()
+    # ── Event handling ─────────────────────────────────────────────────
 
-        # Findings table
-        if self.findings:
-            findings_table = Table(
-                show_header=True,
-                header_style="bold cyan",
-                border_style="blue",
-                title="[bold]Findings[/]",
-                pad_edge=True,
-            )
-            findings_table.add_column("[bold]✓[/]", style="green", justify="center")
-            findings_table.add_column("Type", style="cyan")
-            findings_table.add_column("Target", style="dim")
-            findings_table.add_column("Details", style="white")
+    def on_event(self, event: ExecutionEvent) -> None:
+        """Handle an ExecutionEvent from the Executor."""
+        etype = event.event_type
+        stage = event.stage_name or ""
 
-            for finding in self.findings:
-                icon = "[green]✓[/]" if finding.get("status") != "warning" else "[yellow]![/]"
-                findings_table.add_row(
-                    icon,
-                    finding.get("type", "generic"),
-                    finding.get("target", "?"),
-                    finding.get("detail", ""),
-                )
-            console.print(Panel(findings_table, border_style="green"))
+        if etype == "task_started":
+            data = event.data or {}
+            self.add_log(f"  [bold blue]▶[/] Task started: {data.get('target', '?')}")
+            self.add_log(f"  [dim]Stages:[/dim] {data.get('stages', '?')}")
 
-        # Errors table
-        if self.errors:
-            errors_table = Table(
-                show_header=True,
-                header_style="bold red",
-                border_style="red",
-                title="[bold]Errors[/]",
-                pad_edge=True,
-            )
-            errors_table.add_column("[bold]✗[/]", style="red", justify="center")
-            errors_table.add_column("Stage", style="magenta")
-            errors_table.add_column("Message", style="red")
+        elif etype == "stage_started":
+            self.add_log(f"  [dim]  → {stage}[/]")
 
-            for err in self.errors:
-                errors_table.add_row(
-                    "[red]✗[/]",
-                    err.get("stage", "unknown"),
-                    err.get("message", ""),
-                )
-            console.print(Panel(errors_table, border_style="red"))
+        elif etype == "stage_complete":
+            data = event.data or {}
+            elapsed = data.get("elapsed_ms", 0)
+            success = data.get("success", False)
+            self.complete_stage(stage, success=success, elapsed_ms=elapsed)
+            icon = "[green]✓[/]" if success else "[red]✗[/]"
+            msg = data.get("message", "")
+            self.add_log(f"  {icon} [dim]{stage}[/] — {msg} ({elapsed:.0f}ms)")
 
-        # Summary stats
-        total_stages = len(self.stage_tasks)
-        completed_stages = sum(1 for task in self.progress.tasks if task.completed)
-        summary_text = (
-            f"[bold]Stages:[/]"
-            f" [green]{completed_stages}[/] passed / "
-            f"[red]{total_stages - completed_stages}[/] failed\n"
-            f"[bold]Findings:[/]"
-            f" {len(self.findings)}\n"
-            f"[bold]Errors:[/]"
-            f" {len(self.errors)}"
+        elif etype == "task_finished":
+            data = event.data or {}
+            status = data.get("status", "unknown")
+            results_count = data.get("results_count", 0)
+            self.add_log(f"\n  [bold]Task finished:[/bold] {status}")
+            self.add_log(f"  [dim]Results:[/dim] {results_count}")
+
+    # ── Rendering ──────────────────────────────────────────────────────
+
+    def _render_stage_table(self) -> Table:
+        """Render stage progress table with spinners and progress bars."""
+        table = Table(
+            show_header=False,
+            box=None,
+            pad_edge=True,
+            padding=(0, 1),
         )
-        if completed_stages == total_stages:
-            console.print(
-                Panel(
-                    summary_text,
-                    title="[bold green]Recon Complete[/]",
-                    border_style="green",
-                )
+        table.add_column("icon", width=3, justify="center")
+        table.add_column("stage", style="cyan", no_wrap=True)
+        table.add_column("progress", width=30)
+        table.add_column("stats", style="dim", width=18, justify="right")
+
+        for name, state in self.stages.items():
+            if not state.success and state.error:
+                icon = "[red]✗[/]"
+            elif state.success and state.total > 0:
+                icon = "[green]✓[/]"
+            elif state.completed < state.total:
+                icon = "[yellow]⟳[/]"
+            else:
+                icon = "[dim]○[/]"
+
+            # Build progress bar text
+            if state.total > 0:
+                pct = (state.completed / state.total) * 100
+                bar_text = f"[bold blue]{state.completed}/{state.total}[/] ({pct:.0f}%)"
+            else:
+                bar_text = f"[bold blue]{state.completed}/?[/]"
+
+            # Elapsed time
+            stats_text = f"{state.elapsed_ms / 1000:.1f}s" if state.elapsed_ms > 0 else "—"
+
+            table.add_row(icon, name, bar_text, stats_text)
+
+        return table
+
+    def _render_findings_table(self) -> Table:
+        """Render colored findings table (✓/!/✗)."""
+        table = Table(
+            show_header=True,
+            header_style="bold cyan",
+            border_style="blue",
+            title="[bold]Findings[/]",
+            pad_edge=True,
+            title_justify="left",
+            title_style="bold green",
+        )
+        table.add_column("status", style="green", justify="center", width=3)
+        table.add_column("type", style="cyan")
+        table.add_column("target", style="dim")
+        table.add_column("detail", style="white")
+
+        for f in self.findings:
+            status = f.get("status", "ok")
+            if status == "warning":
+                icon = "[yellow]![/]"
+            elif status in ("error", "critical"):
+                icon = "[red]✗[/]"
+            else:
+                icon = "[green]✓[/]"
+
+            table.add_row(
+                icon,
+                f.get("type", ""),
+                f.get("target", ""),
+                f.get("detail", ""),
             )
-        elif completed_stages > 0:
-            console.print(
-                Panel(
-                    summary_text,
-                    title="[bold yellow]Recon Partial[/]",
-                    border_style="yellow",
-                )
-            )
+
+        return table
+
+    def _render_errors_panel(self) -> Panel | None:
+        """Render errors panel."""
+        if not self.errors:
+            return None
+
+        table = Table(
+            show_header=True,
+            header_style="bold red",
+            border_style="red",
+            title="[bold]Errors[/]",
+            pad_edge=True,
+            title_justify="left",
+        )
+        table.add_column("✗", style="red", justify="center", width=3)
+        table.add_column("stage", style="magenta")
+        table.add_column("message", style="red")
+
+        for e in self.errors:
+            table.add_row("[red]✗[/]", e.get("stage", "?"), e.get("message", ""))
+
+        return Panel(table, border_style="red")
+
+    def _render_log_panel(self) -> Panel:
+        """Render scrollable log panel (last 50 lines)."""
+        recent = self.log_lines[-50:] if self.log_lines else ["  (no log output yet)"]
+        return Panel(
+            "\n".join(recent),
+            title="[bold dim]▸ Log Output[/]",
+            border_style="dim",
+            height=12,
+            subtitle=f"[dim]{len(self.log_lines)} lines total[/]",
+            subtitle_align="right",
+        )
+
+    def _render_summary(self) -> Panel:
+        """Render summary panel with stage stats, findings, and errors."""
+        total_stages = len(self.stages)
+        completed = sum(1 for s in self.stages.values() if s.total > 0 and s.completed >= s.total)
+        failed = sum(1 for s in self.stages.values() if not s.success)
+        total_time = self.elapsed_seconds
+
+        # Determine overall status
+        if total_stages == 0:
+            status_text = "[yellow]No stages executed[/]"
+            status_label = "Idle"
+            border = "yellow"
+        elif completed == total_stages:
+            status_text = "[bold green]All stages passed[/]"
+            status_label = "Complete"
+            border = "green"
+        elif failed > 0:
+            status_text = f"[bold red]{failed} stage(s) failed[/]"
+            status_label = "Partial"
+            border = "yellow"
         else:
-            console.print(
-                Panel(
-                    summary_text,
-                    title="[bold red]Recon Failed[/]",
-                    border_style="red",
-                )
-            )
+            status_text = "[yellow]In progress...[/]"
+            status_label = "Running"
+            border = "yellow"
 
-    def render_log(self) -> None:
-        """Render scrollable log output."""
-        if self.log_lines:
-            log_panel = Panel(
-                "\n".join(self.log_lines[-50:]),
-                title="[bold]Log Output[/]",
-                border_style="dim",
-                height=15,
-            )
-            console.print(log_panel)
+        running = total_stages - completed - failed
+        stats = (
+            f"  {status_text}\n"
+            f"  Stages: [green]{completed}[/] passed "
+            f"/ [red]{failed}[/] failed "
+            f"/ [dim]{running}[/] running\n"
+            f"  Findings: {len(self.findings)}\n"
+            f"  Errors: {len(self.errors)}\n"
+            f"  Elapsed: {total_time:.1f}s"
+        )
 
-    def stop(self) -> None:
-        """Stop the progress display."""
-        self.progress.stop()
-        self.render_log()
-        self.render_summary()
-        console.print()
+        return Panel(
+            stats,
+            title=f"[bold {border}]{status_label}[/]",
+            border_style=border,
+        )
+
+    def render(self) -> Group:
+        """Render the full display as a Rich Group."""
+        children: list[Any] = [
+            self._render_stage_table(),
+            Rule(),
+        ]
+        # Findings (if any)
+        if self.findings:
+            children.append(self._render_findings_table())
+
+        # Errors (if any)
+        errors_panel = self._render_errors_panel()
+        if errors_panel:
+            children.append(errors_panel)
+
+        # Summary
+        children.append(self._render_summary())
+
+        return Group(*children)  # type: ignore[misc, arg-type]
+
+    def render_full(self) -> Group:
+        """Render the full display including log."""
+        children: list[Any] = [
+            self._render_stage_table(),
+            Rule(),
+        ]
+        if self.findings:
+            children.append(self._render_findings_table())
+        errors_panel = self._render_errors_panel()
+        if errors_panel:
+            children.append(errors_panel)
+        children.append(self._render_summary())
+        children.append(self._render_log_panel())
+        return Group(*children)  # type: ignore[misc, arg-type]
 
 
 # ── Commands ─────────────────────────────────────────────────────────────────
@@ -216,12 +361,23 @@ def recon_start(
     recipe: str | None = typer.Option(None, "-r", "--recipe", help="Recipe identifier"),
     name: str = typer.Option("recon", "-n", "--name", help="Task name"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Validate without executing"),
+    live: bool = typer.Option(True, "--live/--no-live", help="Enable live progress display"),
 ) -> None:
     """Run a recon task against a target with rich progress display."""
     display = ReconDisplay()
-    display.start()
+    display.add_log(f"[dim]Target:[/dim] {target_name}")
+    display.add_log(f"[dim]Recipe:[/dim] {recipe or 'defaults'}")
+    display.add_log("")
 
+    # Live display context manager
+    context: Any = None
     try:
+        if live:
+            context = Live(
+                display.render_full(), console=console, refresh_per_second=4, screen=False
+            )
+            context.start()
+
         with Session(get_session()) as session:
             target = session.exec(select(Target).where(Target.name == target_name)).first()
             if target is None:
@@ -241,7 +397,6 @@ def recon_start(
                 description=task_create.description,
                 recipe=task_create.recipe,
                 status=TaskStatus.RUNNING,
-                started_at=task_create.updated_at,
             )
             session.add(task)
             session.commit()
@@ -252,54 +407,61 @@ def recon_start(
             if dry_run:
                 console.print("[blue]--[/] Dry run mode — no stages executed.")
                 task.status = TaskStatus.COMPLETED
-                task.completed_at = task.updated_at
+                task.completed_at = time.time()
                 session.add(task)
                 session.commit()
-                display.render_summary()
+                if live:
+                    context.stop()
+                console.print(Panel("[green]OK[/] Dry run complete.", border_style="green"))
                 return
 
-            async def _run() -> None:
-                for stage in stages:
-                    stage_name = stage.name
-                    display.add_stage(stage_name)
-                    display.add_log(f"[dim]Starting stage:[/dim] {stage_name}")
+            # ── Execute with Executor engine ─────────────────────────
+            executor = Executor(max_concurrent=4, io_workers=8)
 
-                    try:
-                        result = stage.execute(None)
+            async def _run() -> list[dict[str, Any]]:
+                # Register event handler for live display updates
+                executor.on_event(display.on_event)
 
-                        for record in result.records:
-                            finding = {
-                                "type": stage_name,
-                                "target": target_name,
-                                "detail": json.dumps(record)[:80],
-                                "status": "ok",
-                            }
-                            display.add_finding(finding)
-                            display.update_stage(stage_name, advance=1)
+                task_id = str(task.id)
+                await executor.submit(
+                    task_id=task_id,
+                    target_name=target_name,
+                    stages=stages,
+                )
 
-                        display.mark_stage_complete(stage_name, completed=True)
-                        display.add_log(f"[green]Stage {stage_name} completed[/]")
+                # Wait for task to complete
+                while True:
+                    results = executor.get_task_results(task_id)
+                    if results is not None:
+                        break
+                    await asyncio.sleep(0.1)
 
-                    except Exception as exc:
-                        display.mark_stage_complete(stage_name, completed=False)
-                        display.add_error({"stage": stage_name, "message": str(exc)})
-                        display.add_log(f"[red]Stage {stage_name} failed: {exc}[/]")
+                return [r.to_dict() for r in results]
 
-                console.print()
-                task.status = TaskStatus.COMPLETED
-                task.completed_at = task.updated_at
-                session.add(task)
-                session.commit()
+            results = asyncio.run(_run())
 
-            asyncio.run(_run())
+            # Update task status
+            if results:
+                all_success = all(r.get("success", False) for r in results)
+                task.status = TaskStatus.COMPLETED if all_success else TaskStatus.FAILED
+            else:
+                task.status = TaskStatus.FAILED
 
-    except SystemExit:
+            task.completed_at = time.time()
+            session.add(task)
+            session.commit()
+
+        if live:
+            context.stop()
+            console.print()
+
+    except typer.Exit:
         raise
     except Exception as exc:
+        if live and context is not None:
+            context.stop()
         console.print(f"[red]Error: {exc}[/]")
         raise typer.Exit(code=1) from exc
-    finally:
-        display.stop()
 
 
 @app.command("list")

@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -27,7 +27,7 @@ from uuid import UUID
 logger = logging.getLogger(__name__)
 
 
-class ReportFormat(str, Enum):
+class ReportFormat(StrEnum):
     """Supported report export formats."""
 
     JSON = "json"
@@ -98,16 +98,12 @@ class Reporter:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         if filename is None:
-            suffixes = {
-                ReportFormat.JSON: ".json",
-                ReportFormat.MARKDOWN: ".md",
-                ReportFormat.HTML: ".html",
-            }
-            filename = f"report-{self.task_id.hex()}{suffixes[fmt]}"
+            ext = {"json": ".json", "markdown": ".md", "html": ".html"}.get(fmt.value, ".json")
+            filename = f"report-{self.task_id.hex()}{ext}"  # type: ignore[operator]
 
-        filepath = self.output_dir / filename
+        filepath: Path = self.output_dir / filename
         content = self.generate(fmt)
-        filepath.write_text(content, encoding="utf-8")
+        filepath.write_text(content, encoding="utf-8")  # type: ignore[operator, attr-defined]
         logger.info("Report exported: %s (%s)", filepath, fmt.value)
         return filepath
 
@@ -126,7 +122,11 @@ class Reporter:
         """
         results: dict[ReportFormat, Path] = {}
         for fmt in ReportFormat:
-            fname = f"{filename_prefix}-{fmt.value}.html" if fmt == ReportFormat.HTML else f"{filename_prefix}-{fmt.value}"
+            fname = (
+                f"{filename_prefix}-{fmt.value}.html"
+                if fmt == ReportFormat.HTML
+                else f"{filename_prefix}-{fmt.value}"
+            )
             results[fmt] = self.export(fmt, filename=fname)
         return results
 
@@ -139,9 +139,10 @@ class Reporter:
             Task data including task info, records, and metadata.
         """
         # Import here to avoid circular imports
+        from sqlmodel import select
+
         from osintote.models.database import get_session
         from osintote.models.orm import Record, Task
-        from sqlmodel import select
 
         with get_session() as session:
             task = session.get(Task, self.task_id)
@@ -172,7 +173,9 @@ class Reporter:
                 ],
                 "metadata": {
                     "total_records": len(records),
-                    "record_types": list(set(r.record_type.value for r in records if r.record_type)),
+                    "record_types": list(
+                        set(r.record_type.value for r in records if r.record_type)
+                    ),
                 },
             }
 

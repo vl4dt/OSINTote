@@ -12,7 +12,7 @@ Generates standalone HTML reports with:
 
 from __future__ import annotations
 
-import json
+import json  # noqa: F401
 import logging
 from typing import Any
 
@@ -47,16 +47,24 @@ class HTMLExporter:
         records = self.data.get("records", [])
         metadata = self.data.get("metadata", {})
         summary = self._compute_summary(records)
+        risk_level_text = (
+            "HIGH"
+            if summary["risk_level"] == "high"
+            else "MODERATE"
+            if summary["risk_level"] == "moderate"
+            else "LOW"
+        )
 
         # Prepare data for vis.js
-        vis_data = self._build_vis_data(records)
+        vis_data = self._build_vis_data(records)  # noqa: F841
 
-        return f"""<!DOCTYPE html>
+        return (
+            f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OSINT Report — {task.get('name', 'Unknown')}</title>
+    <title>OSINT Report — {task.get("name", "Unknown")}</title>
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
         :root {{
@@ -82,7 +90,12 @@ class HTMLExporter:
         }}
         .container {{ max-width: 1200px; margin: 0 auto; }}
         h1 {{ font-size: 2rem; margin-bottom: 1rem; color: var(--text-primary); }}
-        h2 {{ font-size: 1.5rem; margin: 2rem 0 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }}
+        h2 {{
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }}
         h3 {{ font-size: 1.2rem; margin: 1rem 0 0.5rem; }}
         .card {{
             background: var(--bg-secondary);
@@ -194,34 +207,36 @@ class HTMLExporter:
         <div class="card">
             <h2>Task Information</h2>
             <table>
-                <tr><th>Task ID</th><td><code>{task.get('id', 'N/A')}</code></td></tr>
-                <tr><th>Name</th><td>{task.get('name', 'N/A')}</td></tr>
-                <tr><th>Status</th><td><span class="badge badge-info">{task.get('status', 'N/A')}</span></td></tr>
-                <tr><th>Recipe</th><td>{task.get('recipe', 'custom') or 'custom'}</td></tr>
-                <tr><th>Created</th><td>{task.get('created_at', 'N/A')}</td></tr>
-                <tr><th>Completed</th><td>{task.get('completed_at', 'N/A')}</td></tr>
+                <tr><th>Task ID</th><td><code>{task.get("id", "N/A")}</code></td></tr>
+                <tr><th>Name</th><td>{task.get("name", "N/A")}</td></tr>
+                <tr><th>Status</th><td>
+                    <span class="badge badge-info">{task.get("status", "N/A")}</span>
+                </td></tr>
+                <tr><th>Recipe</th><td>{task.get("recipe", "custom") or "custom"}</td></tr>
+                <tr><th>Created</th><td>{task.get("created_at", "N/A")}</td></tr>
+                <tr><th>Completed</th><td>{task.get("completed_at", "N/A")}</td></tr>
             </table>
         </div>
 
         <div class="card">
             <h2>Risk Assessment</h2>
-            <div class="risk-score risk-{summary['risk_level']}">{summary['risk_score']}/10</div>
+            <div class="risk-score risk-{summary["risk_level"]}">{summary["risk_score"]}/10</div>
             <p style="text-align:center; color: var(--text-secondary);">
-                {'HIGH' if summary['risk_level'] == 'high' else 'MODERATE' if summary['risk_level'] == 'moderate' else 'LOW'} Risk
+                {risk_level_text} Risk
             </p>
         </div>
 
         <div class="stat-grid">
             <div class="stat-card">
-                <div class="stat-value">{summary['total_records']}</div>
+                <div class="stat-value">{summary["total_records"]}</div>
                 <div class="stat-label">Total Records</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">{len(summary['type_counts'])}</div>
+                <div class="stat-value">{len(summary["type_counts"])}</div>
                 <div class="stat-label">Record Types</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">{len(metadata.get('record_types', []))}</div>
+                <div class="stat-value">{len(metadata.get("record_types", []))}</div>
                 <div class="stat-label">Unique Types</div>
             </div>
         </div>
@@ -234,15 +249,17 @@ class HTMLExporter:
                 <tr><th>#</th><th>Type</th><th>Target</th><th>Data</th></tr>
             </thead>
             <tbody>
-""" + "".join(
-            f"""                <tr data-type="{r.get('type', 'unknown')}" data-target="{r.get('target', '')}">
+"""
+            + "".join(
+                f"""                <tr data-type="{r.get("type", "unknown")}">
                     <td>{i}</td>
-                    <td><span class="badge badge-info">{r.get('type', 'unknown')}</span></td>
-                    <td><code>{r.get('target', 'N/A')}</code></td>
-                    <td>{self._format_record_data(r.get('data', {}))}</td>
+                    <td><span class="badge badge-info">{r.get("type", "unknown")}</span></td>
+                    <td><code>{r.get("target", "N/A")}</code></td>
+                    <td>{self._format_record_data(r.get("data", {}))}</td>
                 </tr>"""
-            for i, r in enumerate(records, 1)
-        ) + """
+                for i, r in enumerate(records, 1)
+            )
+            + """
             </tbody>
         </table>
 
@@ -315,6 +332,7 @@ class HTMLExporter:
     </script>
 </body>
 </html>"""
+        )
 
     def _compute_summary(self, records: list[dict[str, Any]]) -> dict[str, Any]:
         """Compute summary statistics."""
@@ -324,7 +342,15 @@ class HTMLExporter:
             type_counts[rtype] = type_counts.get(rtype, 0) + 1
 
         # Simple risk scoring
-        risk_indicators = {"ip": 1, "domain": 1, "http": 3, "dns": 1, "whois": 2, "port": 2, "vuln": 5}
+        risk_indicators = {
+            "ip": 1,
+            "domain": 1,
+            "http": 3,
+            "dns": 1,
+            "whois": 2,
+            "port": 2,
+            "vuln": 5,
+        }
         total_risk = sum(risk_indicators.get(rtype, 0) for rtype in type_counts)
         risk_score = min(10, total_risk)
         risk_level = "low" if risk_score < 5 else "moderate" if risk_score < 8 else "high"
@@ -361,30 +387,36 @@ class HTMLExporter:
             rtype = record.get("type", "unknown")
             if target not in node_id_map:
                 node_id_map[target] = next_id
-                nodes.append({
-                    "id": next_id,
-                    "label": target,
-                    "shape": "dot",
-                    "size": 20,
-                    "color": {"background": "#58a6ff", "border": "#1f6feb"},
-                    "title": f"Target: {target}",
-                })
+                nodes.append(
+                    {
+                        "id": next_id,
+                        "label": target,
+                        "shape": "dot",
+                        "size": 20,
+                        "color": {"background": "#58a6ff", "border": "#1f6feb"},
+                        "title": f"Target: {target}",
+                    }
+                )
                 next_id += 1
 
             record_id = next_id
-            nodes.append({
-                "id": next_id,
-                "label": rtype,
-                "shape": "box",
-                "size": 15,
-                "color": {"background": "#3fb950", "border": "#238636"},
-                "title": f"Record type: {rtype}",
-            })
-            edges.append({
-                "from": node_id_map[target],
-                "to": record_id,
-                "label": rtype,
-            })
+            nodes.append(
+                {
+                    "id": next_id,
+                    "label": rtype,
+                    "shape": "box",
+                    "size": 15,
+                    "color": {"background": "#3fb950", "border": "#238636"},
+                    "title": f"Record type: {rtype}",
+                }
+            )
+            edges.append(
+                {
+                    "from": node_id_map[target],
+                    "to": record_id,
+                    "label": rtype,
+                }
+            )
             next_id += 1
 
         return {"nodes": nodes, "edges": edges}
