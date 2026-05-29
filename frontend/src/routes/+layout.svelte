@@ -15,7 +15,8 @@
 		{ id: 'dashboard', label: 'Dashboard', href: '/dashboard' },
 		{ id: 'targets', label: 'Targets', href: '/targets' },
 		{ id: 'tasks', label: 'Tasks', href: '/tasks' },
-		{ id: 'results', label: 'Results', href: '/results' }
+		{ id: 'results', label: 'Results', href: '/results' },
+		{ id: 'logs', label: 'Logs', href: '/logs' }
 	];
 
 	// Update clock (browser only)

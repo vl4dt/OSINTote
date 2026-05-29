@@ -73,3 +73,13 @@ export interface SSEEvent {
 	data?: Record<string, unknown>;
 	timestamp: string;
 }
+
+// --- Logs ---
+
+export interface LogEntry {
+	timestamp: string;
+	level: string;
+	logger: string;
+	message: string;
+	pid?: number;
+}

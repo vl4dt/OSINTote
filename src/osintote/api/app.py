@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from osintote.__about__ import __version__
+from osintote.api.routes import logs
 
 
 @asynccontextmanager
@@ -48,3 +49,6 @@ app.add_middleware(
 async def health_check() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "ok", "version": __version__}
+
+
+app.include_router(logs.router)

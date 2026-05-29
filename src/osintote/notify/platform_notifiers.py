@@ -87,7 +87,7 @@ class PlatformNotifier:
         """Send notification via PowerShell toast (Windows)."""
         # Simplified toast notification using PowerShell
         # Creates a toast notification that appears in the action center
-        script = f'''
+        script = f"""
         [Windows.UI.Notifications.ToastNotificationManager,
          Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
         [Windows.Data.Xml.Dom.XmlDocument,
@@ -106,7 +106,7 @@ class PlatformNotifier:
         $xml.LoadXml($template)
         $toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
         [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("OSINTote").Show($toast)
-        '''
+        """
         try:
             subprocess.run(
                 ["powershell", "-Command", script.strip()],

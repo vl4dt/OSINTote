@@ -63,9 +63,7 @@ class TestSendDisabled:
     async def test_send_async_disabled(self):
         """Test async send with disabled notifier."""
         notifier = PlatformNotifier(enabled=False)
-        result = await notifier.send_async(
-            NotificationRequest("Test", "Body")
-        )
+        result = await notifier.send_async(NotificationRequest("Test", "Body"))
         assert result is False
 
 
