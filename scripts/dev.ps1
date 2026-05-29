@@ -60,8 +60,9 @@ function Start-Frontend {
     Write-Host "Starting frontend dev server at http://localhost:${script:FrontendPort}..." -ForegroundColor Cyan
     Write-Host ""
 
-    $script:FrontendProcess = Start-Process npm -ArgumentList @("run", "dev") `
-        -WorkingDirectory (Join-Path $PSScriptRoot "../frontend") `
+    $frontendDir = Join-Path $PSScriptRoot "../frontend"
+    $script:FrontendProcess = Start-Process cmd.exe -ArgumentList @("/c", "npm", "run", "dev") `
+        -WorkingDirectory $frontendDir `
         -NoNewWindow -PassThru
 
     Write-Host "  Frontend PID: $($script:FrontendProcess.Id)" -ForegroundColor Green
