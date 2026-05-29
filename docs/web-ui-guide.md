@@ -2,6 +2,49 @@
 
 Complete walkthrough of the OSINTote web interface.
 
+## Running the Web UI
+
+The Web UI is served by a Vite/SvelteKit dev server. It runs **alongside** the backend API server (port 8000).
+
+### Recommended: Dev Script
+
+**Unix/macOS:**
+
+```bash
+./scripts/dev.sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+.\scripts\dev.ps1
+```
+
+### Alternative: Manual Start
+
+```bash
+# Terminal 1 — Backend API server
+osintote serve
+
+# Terminal 2 — Frontend dev server
+cd frontend
+npm run dev
+```
+
+### Production Build
+
+```bash
+docker-compose up --build
+```
+
+### URLs
+
+| URL | Description |
+|-----|-------------|
+| `http://localhost:5173` | Web UI (frontend dev server) |
+| `http://127.0.0.1:8000` | Backend API server |
+| `http://127.0.0.1:8000/api/docs` | Swagger UI (interactive API docs) |
+
 ## Overview
 
 The Web UI provides a dark-themed, 3-panel interface for OSINT operations:

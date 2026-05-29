@@ -77,6 +77,8 @@ Both must be running simultaneously for full functionality.
 
 ### Option 1: Dev Script (Recommended)
 
+**Unix/macOS:**
+
 ```bash
 # Start both servers
 ./scripts/dev.sh
@@ -86,10 +88,21 @@ Both must be running simultaneously for full functionality.
 ./scripts/dev.sh ui    # Frontend only
 ```
 
-### Option 2: Makefile
+**Windows (PowerShell):**
+
+```powershell
+# Start both servers
+.\scripts\dev.ps1
+
+# Or only one of them
+.\scripts\dev.ps1 api   # Backend only
+.\scripts\dev.ps1 ui    # Frontend only
+```
+
+### Option 2: Makefile (Unix/macOS only)
 
 ```bash
-# Start both servers (Unix/macOS)
+# Start both servers
 make dev
 
 # Or start them in separate terminals
@@ -97,11 +110,24 @@ osintote serve                        # Terminal 1 — backend
 make dev                              # Terminal 2 — frontend (cd frontend && npm run dev)
 ```
 
-> **Note:** `make dev` uses background jobs (`&`) which work on Unix/macOS. On Windows, use the `scripts/dev.sh` script or open two terminals manually.
+> **Note:** `make dev` uses background jobs (`&`) which only work on Unix/macOS. On Windows, use the PowerShell dev script or open two terminals manually.
 
 ### Option 3: Manual (Two Terminals)
 
+**Unix/macOS:**
+
 ```bash
+# Terminal 1 — Backend API server
+osintote serve
+
+# Terminal 2 — Frontend dev server
+cd frontend
+npm run dev
+```
+
+**Windows (PowerShell):**
+
+```powershell
 # Terminal 1 — Backend API server
 osintote serve
 

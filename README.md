@@ -42,16 +42,32 @@ source .venv/bin/activate   # Linux/macOS
 ```bash
 # Initialize the project (creates config, database, migrations)
 osintote init
+```
 
-# Start the dev servers (backend API + frontend UI)
+**Start the dev servers (backend API + frontend UI):**
+
+**Unix/macOS:**
+
+```bash
 ./scripts/dev.sh
+```
 
-# Or use make (Unix/macOS only)
+**Windows (PowerShell):**
+
+```powershell
+.\scripts\dev.ps1
+```
+
+**Or use make (Unix/macOS only):**
+
+```bash
 make dev
+```
 
-# Or start servers in separate terminals
+**Or start servers in separate terminals:**
+
+```bash
 osintote serve                    # Terminal 1 — backend API
-osintote serve --reload           # Terminal 1 — backend with hot-reload
 make dev                          # Terminal 2 — frontend dev server
 ```
 
