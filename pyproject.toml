@@ -56,6 +56,11 @@ dev = [
   "pytest-httpx>=0.32.0",
   "faker>=30.0.0",
 ]
+build = [
+  "hatch>=1.14.0",
+  "build>=1.2.0",
+  "twine>=6.0.0",
+]
 docs = [
   "jinja2>=3.1.0",
 ]
@@ -68,7 +73,7 @@ path = "src/osintote/__about__.py"
 
 [tool.hatch.build]
 include = ["src/osintote"]
-exclude = ["*.bak", "*.pyc", "__pycache__"]
+exclude = ["*.bak", "*.pyc", "__pycache__", "src/osintote/tests", "src/osintote/tests/"]
 
 [tool.hatch.envs.default]
 dependencies = [
@@ -90,6 +95,20 @@ test-cov-report = [
   "coverage report",
   "coverage html",
 ]
+
+[tool.hatch.envs.build]
+dependencies = [
+  "hatch>=1.14.0",
+  "build>=1.2.0",
+  "twine>=6.0.0",
+]
+
+[tool.hatch.envs.build.scripts]
+pkg = "python -m build"
+twine-check = "twine check dist/*"
+
+[tool.hatch.envs.build-template]
+template = "build"
 
 [tool.coverage.run]
 source_pkgs = ["osintote"]
