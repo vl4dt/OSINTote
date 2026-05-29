@@ -31,6 +31,7 @@ from osintote.engine.stage import (
     StageTester,
     register_stage,
 )
+from osintote.engine.wal import WALEntry, WriteAheadLog
 
 __all__ = [
     "STAGE_REGISTRY",
@@ -51,7 +52,10 @@ __all__ = [
     "StageTester",
     "SubfinderConfig",
     "VirusTotalConfig",
+    "WALEntry",
     "WhoisConfig",
+    "WriteAheadLog",
     "config",
     "register_stage",
+    "wal",
 ]

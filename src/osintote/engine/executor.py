@@ -33,6 +33,7 @@ from typing import Any
 from ..models.orm import ErrorSeverity, TaskStatus
 from ..notify.notifier import Notifier
 from .stage import Stage, StageContext, StageResult
+from .wal import WriteAheadLog
 
 logger = logging.getLogger(__name__)
 
@@ -146,11 +147,13 @@ class Executor:
         io_workers: int = 8,
         cpu_workers: int = 2,
         notifier: Notifier | None = None,
+        wal: WriteAheadLog | None = None,
     ) -> None:
         self.max_concurrent = max_concurrent
         self.io_workers = io_workers
         self.cpu_workers = cpu_workers
         self.notifier = notifier
+        self.wal = wal
 
         self._semaphore: asyncio.Semaphore | None = None
         self._task_queue: asyncio.PriorityQueue[TaskItem] = asyncio.PriorityQueue()
@@ -293,6 +296,12 @@ class Executor:
                 data={"target": item.target_name, "stages": len(item.stages)},
             )
         )
+        # Persist status to WAL
+        if self.wal:
+            self.wal.write_task_update(
+                task_id,
+                {"status": TaskStatus.RUNNING.value, "stages": len(item.stages)},
+            )
 
         results: list[StageResult] = []
 
@@ -307,6 +316,8 @@ class Executor:
         for stages, cost_event in zip(cost_order, cost_events, strict=True):
             if self.is_cancelled(task_id):
                 ctx.update_status(TaskStatus.CANCELLED.value)
+                if self.wal:
+                    self.wal.write_task_update(task_id, {"status": TaskStatus.CANCELLED.value})
                 self._emit(
                     ExecutionEvent(
                         task_id=task_id,
@@ -322,6 +333,10 @@ class Executor:
                 for stage in stages:
                     if self.is_cancelled(task_id):
                         ctx.update_status(TaskStatus.CANCELLED.value)
+                        if self.wal:
+                            self.wal.write_task_update(
+                                task_id, {"status": TaskStatus.CANCELLED.value}
+                            )
                         self._emit(
                             ExecutionEvent(
                                 task_id=task_id,
@@ -338,6 +353,10 @@ class Executor:
                         results.append(result)
                         ctx.findings[stage.name] = result.to_dict()
                         ctx.records.extend(result.data if isinstance(result.data, list) else [])
+                        if self.wal and result.data and isinstance(result.data, list):
+                            for rec in result.data:
+                                if isinstance(rec, dict) and "id" in rec:
+                                    self.wal.write_record_insert(str(rec["id"]), rec)
                     finally:
                         self._semaphore.release()
             else:
@@ -345,6 +364,10 @@ class Executor:
                 for stage in stages:
                     if self.is_cancelled(task_id):
                         ctx.update_status(TaskStatus.CANCELLED.value)
+                        if self.wal:
+                            self.wal.write_task_update(
+                                task_id, {"status": TaskStatus.CANCELLED.value}
+                            )
                         self._emit(
                             ExecutionEvent(
                                 task_id=task_id,
@@ -358,11 +381,24 @@ class Executor:
                     results.append(result)
                     ctx.findings[stage.name] = result.to_dict()
                     ctx.records.extend(result.data if isinstance(result.data, list) else [])
+                    if self.wal and result.data and isinstance(result.data, list):
+                        for rec in result.data:
+                            if isinstance(rec, dict) and "id" in rec:
+                                self.wal.write_record_insert(str(rec["id"]), rec)
 
         # Determine final status
         failed = [r for r in results if not r.success]
         if failed:
             ctx.update_status(TaskStatus.FAILED.value)
+            if self.wal:
+                self.wal.write_task_update(
+                    task_id,
+                    {
+                        "status": TaskStatus.FAILED.value,
+                        "failures": len(failed),
+                        "results_count": len(results),
+                    },
+                )
             self._emit(
                 ExecutionEvent(
                     task_id=task_id,
@@ -376,6 +412,11 @@ class Executor:
             )
         else:
             ctx.update_status(TaskStatus.COMPLETED.value)
+            if self.wal:
+                self.wal.write_task_update(
+                    task_id,
+                    {"status": TaskStatus.COMPLETED.value, "results_count": len(results)},
+                )
             self._emit(
                 ExecutionEvent(
                     task_id=task_id,
