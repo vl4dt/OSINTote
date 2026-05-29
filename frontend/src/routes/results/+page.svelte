@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Result } from '$lib/types';
-	import { apiService } from '$lib/api/mock';
+	import { apiService } from '$lib/api/real';
 	import ResultRow from '$lib/components/ResultRow.svelte';
 	import ResultDetail from '$lib/components/ResultDetail.svelte';
 	import EmptyState from '$lib/components/EmptyState.svelte';

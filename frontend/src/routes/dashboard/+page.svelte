@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { apiService } from '$lib/api/mock';
+	import { apiService } from '$lib/api/real';
 	import EmptyState from '$lib/components/EmptyState.svelte';
 
 	let targets = $state<number>(0);

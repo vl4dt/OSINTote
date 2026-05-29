@@ -3,7 +3,7 @@
 <!-- Settings Form — AI config, recipes, output format, theme -->
 
 <script lang="ts">
-	import { apiService } from '$lib/api/mock';
+	import { apiService } from '$lib/api/real';
 	import ApiKeyManager from '$lib/components/ApiKeyManager.svelte';
 
 	let activeTab: string = $state('ai');

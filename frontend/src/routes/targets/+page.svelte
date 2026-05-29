@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Target } from '$lib/types';
-	import { apiService } from '$lib/api/mock';
+	import { apiService } from '$lib/api/real';
 	import TargetCard from '$lib/components/TargetCard.svelte';
 	import TargetDetail from '$lib/components/TargetDetail.svelte';
 	import TargetDialog from '$lib/components/TargetDialog.svelte';

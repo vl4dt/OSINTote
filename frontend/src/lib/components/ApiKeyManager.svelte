@@ -3,7 +3,7 @@
 <!-- API Key Manager — CRUD for external service credentials -->
 
 <script lang="ts">
-	import { apiService } from '$lib/api/mock';
+	import { apiService } from '$lib/api/real';
 	import type { ApiKey } from '$lib/types';
 
 	let keys: ApiKey[] = $state([]);

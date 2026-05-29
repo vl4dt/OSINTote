@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Task, SSEEvent } from '$lib/types';
-	import { apiService } from '$lib/api/mock';
+	import { apiService } from '$lib/api/real';
 	import TaskCard from '$lib/components/TaskCard.svelte';
 	import TaskDetail from '$lib/components/TaskDetail.svelte';
 	import TaskDialog from '$lib/components/TaskDialog.svelte';
@@ -51,6 +51,9 @@
 		detailTask = null;
 	}
 
+	// SSE cleanup handles
+	const sseHandles = $state<Set<() => void>>(new Set());
+
 	// SSE handler for live updates
 	function handleSSEEvent(event: SSEEvent): void {
 		if (event.type === 'progress' && event.taskId && event.data?.progress) {
@@ -83,6 +86,24 @@
 				applyFilters();
 			}
 		}
+	}
+
+	// Connect to SSE for all running tasks
+	function connectSSE(): void {
+		tasks.forEach(t => {
+			if (t.status === 'running') {
+				const handle = apiService.subscribeSSEForTask(t.id, handleSSEEvent);
+				sseHandles.add(handle);
+			}
+		});
+	}
+
+	// Disconnect all SSE streams
+	function disconnectSSE(): void {
+		for (const handle of sseHandles.values()) {
+			handle();
+		}
+		sseHandles.clear();
 	}
 
 	async function handleCreateTask(data: { name: string; type: string; targetId: string; recipeId?: string }): Promise<void> {
@@ -153,7 +174,8 @@
 
 	onMount(() => {
 		loadTasks();
-		apiService.subscribeSSE(handleSSEEvent);
+		// Connect SSE after a short delay so tasks have loaded
+		setTimeout(connectSSE, 500);
 	});
 </script>
 

@@ -1,5 +1,4 @@
-# SPDX-FileCopyrightText: 2026-present Ricardo A. Salgado <ricr.sb@gmail.com>
-#
+# SPDX-FileCopyrightText: 2026-present Ricardo A. Salgado
 # SPDX-License-Identifier: MIT
 """OSINTote FastAPI application."""
 
@@ -10,12 +9,23 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from osintote.__about__ import __version__
-from osintote.api.routes import ai, api_keys, errors, logs, tasks, webhooks
+from osintote.api.routes import (
+    ai,
+    api_keys,
+    errors,
+    logs,
+    recipes,
+    records,
+    relationships,
+    reports,
+    targets,
+    tasks,
+    webhooks,
+)
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
-    """Application lifespan — run migrations, init executor at startup."""
     """Application lifespan — run migrations, init executor at startup."""
     # Run Alembic migrations on startup
     try:
@@ -68,5 +78,10 @@ app.include_router(ai.router)
 app.include_router(api_keys.router)
 app.include_router(errors.router)
 app.include_router(logs.router)
+app.include_router(recipes.router)
+app.include_router(records.router)
+app.include_router(relationships.router)
+app.include_router(reports.router)
+app.include_router(targets.router)
 app.include_router(tasks.router)
 app.include_router(webhooks.router)
