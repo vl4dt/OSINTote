@@ -1,21 +1,5 @@
-# ---- Python backend ----
-FROM python:3.14-slim AS python-base
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-WORKDIR /app
-
-# Install uv
-RUN pip install --no-cache-dir uv
-
-COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-install-project --group dev
-
-COPY src/ ./src/
-
-# ---- SvelteKit frontend ----
-FROM node:22-slim AS node-base
+# Stage 1: Node frontend build
+FROM node:22-slim AS frontend-builder
 
 WORKDIR /app/frontend
 
@@ -25,24 +9,32 @@ RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-# ---- Final image ----
+# Stage 2: Python backend + copied frontend build
 FROM python:3.14-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    OSINTOTE_LISTEN_HOST=0.0.0.0 \
     OSINTOTE_DB_PATH=/data/osintote.db
 
 WORKDIR /app
 
-RUN useradd --create-home osintote
-USER osintote
+# Install uv
+RUN pip install --no-cache-dir uv
 
+# Install Python dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen
+
+# Copy source code
+COPY src/ ./src/
+
+# Copy frontend build from Stage 1
+COPY --from=frontend-builder /app/frontend/.output ./frontend/.output
+
+# Create data directory for SQLite
 RUN mkdir -p /data /app/.osintote/logs
 
-COPY --from=python-base /app/.venv /app/.venv
-COPY --from=python-base /app/src ./src
+EXPOSE 8000
 
-COPY --from=node-base /app/frontend/.output ./frontend/.output
-
-ENTRYPOINT ["/app/.venv/bin/python", "-m", "osintote.cli"]
-CMD ["serve"]
+CMD ["uvicorn", "osintote.api.app:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "/app/src"]

@@ -11,7 +11,7 @@ from osintote.engine.stage import Stage, StageContext, StageResult
 
 class MyStage(Stage):
     name = "my_stage"
-    
+
     def execute(self, context: StageContext) -> StageResult:
         # Perform reconnaissance
         data = {"result": "collected_data"}

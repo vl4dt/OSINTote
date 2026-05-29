@@ -1,0 +1,20 @@
+services:
+  osintote:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - OSINTOTE_LISTEN_HOST=0.0.0.0
+      - OSINTOTE_DB_PATH=/data/osintote.db
+    volumes:
+      - osintote-data:/data
+      - osintote-config:/app/.osintote
+    restart: unless-stopped
+
+volumes:
+  osintote-data:
+    driver: local
+  osintote-config:
+    driver: local

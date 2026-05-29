@@ -24,7 +24,7 @@ Use **AES-256-GCM** for symmetric encryption with **PBKDF2** for key derivation.
 class EncryptedBlob:
     MAGIC = b'OSINT'
     # Layout: MAGIC + iv(12) + tag(16) + ciphertext
-    
+
 class KeyStorage:
     # Stores the PBKDF2 salt alongside the AES key
     pbkdf2_salt: bytes
