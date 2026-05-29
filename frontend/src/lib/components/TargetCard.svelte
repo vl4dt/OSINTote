@@ -1,23 +1,26 @@
 <script lang="ts">
-	export let target: {
-		id: string;
-		name: string;
-		type: string;
-		status?: string;
-		lastSeen?: string;
-		tags?: string[];
-	};
+	let { target, selected = false, onClick }: {
+		target: { id: string; name: string; type: string; status?: string; lastSeen?: string; tags?: string[]; recordCount?: number; taskCount?: number };
+		selected?: boolean;
+		onClick: (e: MouseEvent) => void;
+	} = $props();
 
-	export let selected: boolean = false;
-	export let onClick: () => void = () => {};
+	const cardClass = $derived(
+		selected
+			? 'border-[var(--color-accent)] bg-[color:rgba(88,166,255,0.08)] shadow-sm'
+			: 'border-[var(--color-border-0)] bg-[var(--color-bg-2)] hover:border-[var(--color-border-1)] hover:bg-[var(--color-bg-3)]'
+	);
+
+	const statusDotClass = $derived(
+		target.status === 'active' ? 'bg-[var(--color-success)]' :
+		target.status === 'inactive' ? 'bg-[var(--color-text-3)]' :
+		'bg-[var(--color-warning)]'
+	);
 </script>
 
 <button
-	class="w-full text-left p-3 rounded-md border transition-all
-		{selected
-			? 'border-[var(--color-accent)] bg-[color:rgba(88,166,255,0.08)] shadow-sm'
-			: 'border-[var(--color-border-0)] bg-[var(--color-bg-2)] hover:border-[var(--color-border-1)] hover:bg-[var(--color-bg-3)]'}"
-	on:click>
+	class="w-full text-left p-3 rounded-md border transition-all {cardClass}"
+	onclick={onClick}>
 	<div class="flex items-start justify-between gap-2 mb-1.5">
 		<span class="text-sm font-medium text-[var(--color-text-0)] truncate">
 			{target.name}

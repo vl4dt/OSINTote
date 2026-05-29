@@ -6,10 +6,10 @@
 type RouteModule = { default: any };
 
 const routeImports: Record<string, () => Promise<RouteModule>> = {
-	dashboard: () => import('../routes/dashboard/+page.svelte'),
-	targets: () => import('../routes/targets/+page.svelte'),
-	tasks: () => import('../routes/tasks/+page.svelte'),
-	results: () => import('../routes/results/+page.svelte'),
+	dashboard: () => import('../routes/dashboard/+page.svelte') as Promise<RouteModule>,
+	targets: () => import('../routes/targets/+page.svelte') as Promise<RouteModule>,
+	tasks: () => import('../routes/tasks/+page.svelte') as Promise<RouteModule>,
+	results: () => import('../routes/results/+page.svelte') as Promise<RouteModule>,
 };
 
 /**

@@ -1,18 +1,21 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	onMount(() => {
-		window.location.replace('/dashboard');
+		if (browser) {
+			window.location.href = '/dashboard';
+		}
 	});
 </script>
 
-<div class="flex items-center justify-center h-screen bg-[var(--color-bg-0)]">
+<div class="flex flex-col items-center justify-center h-full gap-4">
 	<div class="text-center">
-		<div class="mb-4">
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-[var(--color-text-3)] mx-auto animate-spin" viewBox="0 0 24 24" fill="none">
-				<path d="M12 2v4m0 12v4m-9.17-15.17l2.83 2.83m11.34 11.34l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m11.34-11.34l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-			</svg>
-		</div>
-		<p class="text-sm text-[var(--color-text-3)]">Loading OSINTote...</p>
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-[var(--color-accent)] mx-auto mb-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<circle cx="12" cy="12" r="10" />
+			<line x1="2" y1="12" x2="22" y2="12" />
+			<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+		</svg>
+		<p class="text-sm text-[var(--color-text-muted)]">Loading OSINTote...</p>
 	</div>
 </div>
