@@ -5,16 +5,16 @@
 ## Summary
 
 ```
-OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  41/57 (72%) | 16 remaining | 0 blocked
+OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---]  45/57 (79%) | 12 remaining | 0 blocked
 ```
 
 | Epic | Status | Done/Total | % |
 |------|--------|-----------|---|
 | **Foundation (enz)** | COMPLETE | 8/8 | 100% |
 | **Pipeline & Engine (yk2)** | COMPLETE | 12/12 | 100% |
-| **Polish & Ship (35e)** | IN PROGRESS | 12/13 | 92% |
-| **Data Sources (jcz)** | IN PROGRESS | 2/13 | 15% |
-| **Intelligence & AI (2yq)** | IN PROGRESS | 1/9 | 11% |
+| **Polish & Ship (35e)** | COMPLETE | 12/12 | 100% |
+| **Data Sources (jcz)** | IN PROGRESS | 10/12 | 83% |
+| **Frontend & Reporting (2yq)** | IN PROGRESS | 2/8 | 25% |
 
 ---
 
@@ -119,19 +119,17 @@ OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  41/57
 
 ## Recommended Next Steps
 
-1. **35e.6** (Final Integration) — ✓ COMPLETE. E2E test, CHANGELOG v0.1.0, reporter fix.
-2. **jcz.5** (CLI wrapper framework) — ✓ COMPLETE. SubprocessRunner for safe async CLI execution.
-3. **jcz.2** (nmap wrapper) — unblocked by jcz.5, uses CLI wrapper framework
-4. **jcz.6** (subfinder wrapper) — unblocked by jcz.5
-5. **jcz.7** (nuclei wrapper) — unblocked by jcz.5
-3. **jcz.9** (Target normalization) — unblocks jcz.1, jcz.3, 2yq.4
-4. **jcz.1** (DNS enumeration) — first concrete data source
-5. **2yq.8** (AI analysis) — requires 2yq.7 (context pruning) first
+1. **jcz.2** (nmap wrapper) — unblocked by jcz.5, uses CLI wrapper framework
+2. **jcz.6** (subfinder wrapper) — unblocked by jcz.5
+3. **jcz.7** (nuclei wrapper) — unblocked by jcz.5
+4. **jcz.8** (API key management) — needed for secure credential storage
+5. **2yq.7** (Context pruning) — unblocked, implemented but task not yet closed
+6. **2yq.8** (AI analysis) — requires 2yq.7 (context pruning) first
 
 ## Test Status
 
-- **354 tests passing**, 2 skipped, 2 warnings
-- Coverage across: engine (executor, stage, wal), CLI, API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming, HTTP probe, error handling, recipes, reports, recon display
+- **484 tests passing**, 2 skipped, 13 warnings
+- Coverage across: engine (executor, stage, wal, rate_limiter, context_pruning), CLI (wrapper, recon_display), API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming, HTTP probe, DNS enumeration, WHOIS, VirusTotal, Shodan, error handling, recipes, reports, webhooks
 
 ## Code Quality
 
