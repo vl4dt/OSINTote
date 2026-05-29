@@ -43,9 +43,7 @@ async def test_stream_endpoint_not_available():
     from fastapi.testclient import TestClient
 
     client = TestClient(app)
-    response = client.get(
-        "/api/tasks/00000000-0000-0000-0000-000000000000/stream"
-    )
+    response = client.get("/api/tasks/00000000-0000-0000-0000-000000000000/stream")
     assert response.status_code == 503
     assert response.json()["detail"] == "Executor not available"
 
@@ -56,9 +54,7 @@ async def test_get_task_events_returns_list(set_executor):
     from fastapi.testclient import TestClient
 
     client = TestClient(app)
-    response = client.get(
-        "/api/tasks/00000000-0000-0000-0000-000000000000/events"
-    )
+    response = client.get("/api/tasks/00000000-0000-0000-0000-000000000000/events")
     assert response.status_code == 200
     events = response.json()
     assert isinstance(events, list)
