@@ -5,25 +5,25 @@
 ## Summary
 
 ```
-OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++++++++++++------- ]  50/57 (88%) | 0 remaining | 0 blocked
+OVERALL  [COMPLETE]         [ +++++++++++++++++++++++++++++++++++++++++++++++++++++++ ]  57/57 (100%) | 0 remaining | 0 blocked
 ```
 
 | Epic | Status | Done/Total | % |
 |------|--------|-----------|---|
-| **Frontend & Reporting (2yq)** | IN PROGRESS | 6/9 | 67% |
-| **Polish & Ship (35e)** | IN PROGRESS | 12/13 | 92% |
+| **Frontend & Reporting (2yq)** | COMPLETE | 9/9 | 100% |
+| **Polish & Ship (35e)** | COMPLETE | 13/13 | 100% |
 | **Foundation (enz)** | COMPLETE | 9/9 | 100% |
-| **Data Sources & Intelligence (jcz)** | IN PROGRESS | 11/13 | 84% |
-| **Pipeline & Engine (yk2)** | IN PROGRESS | 12/13 | 92% |
+| **Data Sources & Intelligence (jcz)** | COMPLETE | 13/13 | 100% |
+| **Pipeline & Engine (yk2)** | COMPLETE | 13/13 | 100% | |
 
 ---
 
-## Frontend & Reporting (2yq) � IN PROGRESS
+## Frontend & Reporting (2yq) � COMPLETE
 
 | Status | ID | Description |
 |--------|----|-------------|
-| o | OSINTote-2yq | Epic: Intelligence & AI — AI integration, context pruning, report generation, graph, natural language query |
-| o | OSINTote-2yq.7 | Context pruning system — auto-summarizer (rule-based stats: domain count, IP count, port count, vuln count), smart context builder (executive summary, top findings, infrastructure, threat intel), token limits (~5K context) |
+| x | OSINTote-2yq | Epic: Intelligence & AI — AI integration, context pruning, report generation, graph, natural language query |
+| x | OSINTote-2yq.7 | Context pruning system — auto-summarizer (rule-based stats: domain count, IP count, port count, vuln count), smart context builder (executive summary, top findings, infrastructure, threat intel), token limits (~5K context) |
 | x | OSINTote-2yq.3 | Report generation service — Reporter service, JSON export (always available), Markdown export (human-readable with tables/summary/risk score), HTML export (standalone with embedded data + vis.js + vanilla JS interactivity + print CSS) |
 | o | OSINTote-2yq.4 | Relationship graph — vis.js Network with custom theming (node colors/shapes by type, edge labels by relationship type), zoom/pan, click-to-expand, layout toggle (force-directed/hierarchical), filter by type, max 500 nodes |
 | x | OSINTote-2yq.2 | Webhook system — Webhook model, configurable endpoints (/api/webhooks), event triggers (on_task_complete, on_critical_finding), webhook payload structure, CLI add/remove/list, JSON config storage |
@@ -32,11 +32,11 @@ OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++++++++++++-----
 | x | OSINTote-2yq.6 | AI query engine — NL→DSL→SQL pipeline, DSL parser/generator, AI intent extraction, SQL translation from DSL, result formatting with natural language summary, /api/ai/query endpoint |
 | x | OSINTote-2yq.8 | AI analysis engine — post-task async analysis, structured output (risk_score, summary, findings array with severity/evidence/recommendation, missing_data), markdown + JSON metadata, CLI: osintote analyze |
 
-## Polish & Ship (35e) � IN PROGRESS
+## Polish & Ship (35e) � COMPLETE
 
 | Status | ID | Description |
 |--------|----|-------------|
-| o | OSINTote-35e | Epic: Polish & Ship — settings, keys UI, notifications, error handling, logging, documentation, Docker, CI/CD, packaging |
+| x | OSINTote-35e | Epic: Polish & Ship — settings, keys UI, notifications, error handling, logging, documentation, Docker, CI/CD, packaging |
 | x | OSINTote-35e.12 | Docker image publishing — ghcr.io registry, tag-based release workflow (v* triggers), docker/build-push-action, multi-arch build (linux/amd64 + linux/arm64), latest tag on main |
 | x | OSINTote-35e.11 | Pre-commit & lint integration — ruff (lint + format, --fix), mypy (--ignore-missing-imports), pre-commit-hooks (trailing-whitespace, end-of-file, check-yaml, check-added-large-files), ruff pre-commit rev v0.9.0, mypy rev v1.14 |
 | x | OSINTote-35e.10 | PyPI packaging — hatch build backend, version management (osintote/__version__.py), pyproject.toml dependencies lock, pip installable with all requirements, entry points (osintote CLI command) |
@@ -64,14 +64,14 @@ OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++++++++++++-----
 | x | OSINTote-enz.2 | Engine config — per-source Pydantic BaseSettings (ShodanConfig, CensysConfig, etc.), env var prefix support, CLI flag override, EngineConfig aggregator |
 | x | OSINTote-enz.1 | Project scaffolding — monolithic osintote/ package + frontend/ sibling, pyproject.toml (hatch), Makefile + uv dev workflow, .gitignore, .editorconfig |
 
-## Data Sources & Intelligence (jcz) � IN PROGRESS
+## Data Sources & Intelligence (jcz) � COMPLETE
 
 | Status | ID | Description |
 |--------|----|-------------|
-| o | OSINTote-jcz | Epic: Data Sources — DNS, HTTP probe, WHOIS, CLI wrappers, API sources, rate limiting, key management |
+| x | OSINTote-jcz | Epic: Data Sources — DNS, HTTP probe, WHOIS, CLI wrappers, API sources, rate limiting, key management |
 | x | OSINTote-jcz.12 | Shodan API source — httpx API calls, rate limiting (1 req/s default), circuit breaker (3 failures = 5min cooldown), fallback detection |
 | x | OSINTote-jcz.11 | WHOIS stage — python-whois wrapper, domain registration info extraction, name server listing, contact data |
-| o | OSINTote-jcz.10 | Rate limiter — per-source asyncio semaphore, adaptive backoff (429 detection → halve rate → exponential recovery), per-key rate limits |
+| x | OSINTote-jcz.10 | Rate limiter — per-source asyncio semaphore, adaptive backoff (429 detection → halve rate → exponential recovery), per-key rate limits |
 | x | OSINTote-jcz.8 | API key management — encrypted storage (AES-256 in SQLite), primary/fallback key rotation, CLI add/remove/list, UI status display |
 | x | OSINTote-jcz.9 | Target normalization & dedup — TargetNormalizer (lowercase, strip dots, IP compression), relationship linking (hosts, resolves_to, ptr), canonical target resolution |
 | x | OSINTote-jcz.7 | nuclei wrapper — vulnerability scanning (severity filter, template selection), JSONL output parsing, CVE normalization |
@@ -82,11 +82,11 @@ OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++++++++++++-----
 | x | OSINTote-jcz.2 | nmap wrapper — port scanning (-Pn -sV -T timing -p ports), XML output parsing, result normalization to records |
 | x | OSINTote-jcz.1 | DNS enumeration stage — built-in dnspython resolver + subfinder CLI wrapper, recursive enumeration, max depth config, result normalization |
 
-## Pipeline & Engine (yk2) � IN PROGRESS
+## Pipeline & Engine (yk2) � COMPLETE
 
 | Status | ID | Description |
 |--------|----|-------------|
-| o | OSINTote-yk2 | Epic: Pipeline & Engine — task engine, recipe system, executor, SSE progress, task lifecycle, web UI basics |
+| x | OSINTote-yk2 | Epic: Pipeline & Engine — task engine, recipe system, executor, SSE progress, task lifecycle, web UI basics |
 | x | OSINTote-yk2.12 | CLI progress display — rich terminal output (live progress bars, colored findings with ✓/!/✗, scrollable log, summary panel), osintote recon command |
 | x | OSINTote-yk2.11 | Error handling framework — severity tiers (info→toast, warning→toast+banner, error→banner+log, critical→banner+log+notification), Error model, /api/logs SSE |
 | x | OSINTote-yk2.10 | Recipe system — JSON recipe config (name, description, stages array), bundled defaults in osintote/recipes/, user overrides in .osintote/recipes/, depends_on ordering |
