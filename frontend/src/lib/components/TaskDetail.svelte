@@ -1,10 +1,22 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import StatusBadge from '$lib/components/StatusBadge.svelte';
+	import SSEStream from '$lib/components/SSEStream.svelte';
+	import type { SSEEvent } from '$lib/types';
 
 	let { task, onClose }: {
 		task: { id: string; name: string; type: string; status: string; targetId?: string; createdAt: string; updatedAt: string; startedAt?: string; completedAt?: string; progress: number; recordsCount: number; error?: string; recipeId?: string };
 		onClose: () => void;
 	} = $props();
+
+	let liveEvents = $state<SSEEvent[]>([]);
+
+	function handleSSE(event: SSEEvent): void {
+		liveEvents.push(event);
+		if (liveEvents.length > 100) liveEvents.shift();
+	}
+
+	const taskStreamUrl = $derived(browser ? `/api/tasks/${task.id}/stream` : '');
 
 	const typeIcon = $derived(
 		task.type === 'nmap' ? '🔍' :
@@ -43,6 +55,16 @@
 </script>
 
 <div class="flex flex-col h-full overflow-hidden">
+	<!-- SSE Live Events -->
+	{#if browser && liveEvents.length > 0}
+		<div class="px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-bg-2)] max-h-[120px] overflow-y-auto">
+			<p class="text-xs text-[var(--color-text-muted)] mb-1">Live events:</p>
+			{#each liveEvents.slice(-10) as event}
+				<div class="text-xs font-mono py-[1px]">{event.type}: {JSON.stringify(event)}</div>
+			{/each}
+		</div>
+	{/if}
+
 	<!-- Header -->
 	<div class="px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-bg-1)]">
 		<div class="flex items-center justify-between">
@@ -164,4 +186,9 @@
 			</dl>
 		</div>
 	</div>
+
+	<!-- SSE Live Stream -->
+	{#if taskStreamUrl}
+		<SSEStream url={taskStreamUrl} onEvent={handleSSE} />
+	{/if}
 </div>

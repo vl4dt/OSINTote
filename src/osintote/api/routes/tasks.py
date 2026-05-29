@@ -15,13 +15,17 @@ Endpoints:
 
 from __future__ import annotations
 
+import asyncio
+import json
 import logging
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from sqlmodel import Session, select
 
-from osintote.engine.executor import Executor
+from osintote.engine.executor import ExecutionEvent, Executor
 from osintote.models.database import get_async_session
 from osintote.models.orm import (
     Log,
@@ -273,7 +277,57 @@ async def delete_task(
 
 @router.get("/{task_id}/events", response_model=list[dict])
 async def get_task_events(task_id: UUID) -> list[dict]:
-    """Get SSE events for a task."""
+    """Get SSE events for a task (snapshot)."""
     if _executor is None:
         raise HTTPException(status_code=503, detail="Executor not available")
     return _executor.get_events(str(task_id))
+
+
+@router.get("/{task_id}/stream")
+async def task_stream(task_id: UUID) -> StreamingResponse:
+    """Server-Sent Events task progress stream.
+
+    Streams task lifecycle events in real-time:
+    - task_started: Task begins execution
+    - progress: Progress updates
+    - stage_complete: Individual stage completion with results
+    - task_finished: Final status (completed/failed/cancelled)
+    """
+    if _executor is None:
+        raise HTTPException(status_code=503, detail="Executor not available")
+
+    task_str = str(task_id)
+    event_queue: asyncio.Queue[ExecutionEvent] = asyncio.Queue()
+
+    def _handler(event: ExecutionEvent) -> None:
+        if event.task_id == task_str:
+            from contextlib import suppress
+
+            with suppress(asyncio.QueueFull):
+                event_queue.put_nowait(event)
+
+    _executor.on_event(_handler)
+
+    async def _stream_generator() -> Any:
+        # Send buffered events first
+        for event in _executor.get_events(task_str):
+            yield f"data: {json.dumps(event)}\n\n"
+            await asyncio.sleep(0)
+
+        # Stream new events
+        while True:
+            try:
+                event = await asyncio.wait_for(event_queue.get(), timeout=15.0)
+                yield f"data: {json.dumps(event.to_dict())}\n\n"
+            except TimeoutError:
+                yield ":\nping\n\n"
+
+    return StreamingResponse(
+        _stream_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

@@ -42,9 +42,7 @@ def task_create(
 ) -> None:
     """Create a new task and add it to the queue."""
     with Session(get_session()) as session:
-        target = session.exec(
-            select(Target).where(Target.name == target_name)
-        ).first()
+        target = session.exec(select(Target).where(Target.name == target_name)).first()
         if target is None:
             typer.echo(f"Target '{target_name}' not found.", err=True)
             raise typer.Exit(code=1)
@@ -72,9 +70,7 @@ def task_list(
     with Session(get_session()) as session:
         query = select(Task)
         if target:
-            tgt = session.exec(
-                select(Target).where(Target.name == target)
-            ).first()
+            tgt = session.exec(select(Target).where(Target.name == target)).first()
             if tgt:
                 query = query.where(Task.target_id == tgt.id)
             else:

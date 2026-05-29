@@ -1,11 +1,19 @@
+<!-- SPDX-FileCopyrightText: 2026-present Ricardo A. Salgado <ricr.sb@gmail.com> -->
+<!-- SPDX-License-Identifier: MIT -->
+<!-- SSE Stream — EventSource-based real-time task progress -->
+
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import type { SSEEvent } from '$lib/types';
 
-	let { url = '/api/events', onEvent }: {
+	let {
+		url = '/api/events',
+		onEvent,
+		autoConnect = true
+	}: {
 		url?: string;
 		onEvent: (event: SSEEvent) => void;
+		autoConnect?: boolean;
 	} = $props();
 
 	let eventSource: EventSource | null = $state(null);
@@ -28,21 +36,23 @@
 		eventSource.onmessage = (e: MessageEvent) => {
 			try {
 				const data = JSON.parse(e.data);
-				const event: SSEEvent = { ...data, timestamp: data.timestamp || new Date().toISOString().replace('T', ' ').slice(0, 19) };
+				const event: SSEEvent = {
+					...data,
+					timestamp: data.timestamp || new Date().toISOString().replace('T', ' ').slice(0, 19)
+				};
 				onEvent(event);
 				lastEvent = event;
 			} catch {
-				// Skip non-JSON messages
+				// Skip non-JSON messages (ping, etc.)
 			}
 		};
 
-		eventSource.onerror = (e: Event) => {
+		eventSource.onerror = () => {
 			connected = false;
 			error = 'Connection lost. Reconnecting...';
 			eventSource?.close();
 			eventSource = null;
 
-			// Reconnect after delay
 			reconnectTimer = setTimeout(connect, 3000);
 		};
 	}
@@ -59,12 +69,11 @@
 		connected = false;
 	}
 
-	onMount(() => {
-		connect();
-	});
-
-	onDestroy(() => {
-		disconnect();
+	$effect(() => {
+		if (autoConnect && browser) {
+			connect();
+			return () => disconnect();
+		}
 	});
 </script>
 
