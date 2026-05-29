@@ -3,15 +3,29 @@
 
 /* OSINTote dark theme */
 @theme {
+	/* Background layers */
 	--color-bg-app: #0d1117;
-	--color-bg-panel: #161b22;
+	--color-bg-1: #0d1117;
+	--color-bg-2: #161b22;
+	--color-bg-3: #1c2128;
 	--color-bg-header: #010409;
 	--color-bg-hover: #1c2128;
+
+	/* Border layers */
 	--color-border: #30363d;
+	--color-border-0: #30363d;
 	--color-border-light: #484f58;
+	--color-border-1: #30363d;
+
+	/* Text layers */
 	--color-text-primary: #e6edf3;
 	--color-text-secondary: #8b949e;
+	--color-text-2: #8b949e;
+	--color-text-3: #6e7681;
 	--color-text-muted: #6e7681;
+	--color-text-0: #e6edf3;
+
+	/* Semantic */
 	--color-accent: #58a6ff;
 	--color-success: #3fb950;
 	--color-warning: #d29922;

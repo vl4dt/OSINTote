@@ -1,4 +1,5 @@
 <script lang="ts">
+	import './layout.css';
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
 	import { preloadAll } from '$lib/lazyRoutes';

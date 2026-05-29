@@ -12,3 +12,6 @@
 {"id":"int-4898602e","kind":"field_change","created_at":"2026-05-28T23:56:15.8070976Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-enz.7","extra":{"field":"status","new_value":"closed","old_value":"in_progress"}}
 {"id":"int-6c5f0247","kind":"field_change","created_at":"2026-05-28T23:56:31.016752Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-enz","extra":{"field":"status","new_value":"closed","old_value":"open"}}
 {"id":"int-b2d3d73d","kind":"field_change","created_at":"2026-05-29T00:20:54.3237242Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.7","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-b691a100","kind":"field_change","created_at":"2026-05-29T01:04:32.1488216Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.5","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-6ac614bd","kind":"field_change","created_at":"2026-05-29T01:04:32.9171969Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.6","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-cddc5d02","kind":"field_change","created_at":"2026-05-29T01:04:33.6433384Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.9","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
