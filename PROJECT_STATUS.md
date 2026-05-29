@@ -5,16 +5,16 @@
 ## Summary
 
 ```
-OVERALL  [+++++++++++++++++++++++++++------------------------------]  27/57 (47%) | 30 remaining | 0 blocked
+OVERALL  [+++++++++++++++++++++++++++------------------------------]  30/57 (53%) | 27 remaining | 0 blocked
 ```
 
 | Epic | Status | Done/Total | % |
 |------|--------|-----------|---|
-| **Foundation (enz)** | COMPLETE | 9/9 | 100% |
-| **Pipeline & Engine (yk2)** | IN PROGRESS | 7/13 | 53% |
-| **Polish & Ship (35e)** | IN PROGRESS | 11/13 | 84% |
-| **Data Sources (jcz)** | NOT STARTED | 0/13 | 0% |
-| **Intelligence & AI (2yq)** | NOT STARTED | 0/9 | 0% |
+| **Foundation (enz)** | COMPLETE | 8/8 | 100% |
+| **Pipeline & Engine (yk2)** | IN PROGRESS | 9/12 | 75% |
+| **Polish & Ship (35e)** | IN PROGRESS | 11/12 | 92% |
+| **Data Sources (jcz)** | IN PROGRESS | 1/12 | 8% |
+| **Intelligence & AI (2yq)** | IN PROGRESS | 1/8 | 12% |
 
 ---
 
@@ -48,8 +48,8 @@ OVERALL  [+++++++++++++++++++++++++++------------------------------]  27/57 (47%
 | ✓ | OSINTote-yk2.7 | Web UI shell — SvelteKit 2.61.1 project setup, dark OSINT theme (GitHub Dark), 3-panel layout (nav/sidebar/content), Panel/TabNav components |
 | ✓ | OSINTote-yk2.9 | Target management UI — /targets page, add/list/remove/show forms, lazy-loaded routes, TargetDialog/TargetDetail |
 | **o** | OSINTote-yk2.8 | Write-ahead log — WriteAhead buffer class, periodic checkpoint (5s), crash recovery |
-| **o** | OSINTote-yk2.10 | Recipe system — JSON recipe config (name, description, stages array), default recipes, recipe loader |
-| **o** | OSINTote-yk2.11 | Error handling framework — severity tiers (info→toast, warning→toast, error→modal), error dashboard |
+| ✓ | OSINTote-yk2.10 | Recipe system — JSON recipe config (name, description, stages array), bundled defaults (quick-scan, full-scan, passive-only), topological sorting, CLI commands |
+| ✓ | OSINTote-yk2.11 | Error handling framework — severity tiers (info→toast, warning→toast+banner, error→banner+log, critical→banner+log+notif), Error model, /api/errors, SSE error stream |
 | **o** | OSINTote-yk2.12 | CLI progress display — rich terminal output (live progress bars, colored output, spinner animation) |
 
 ---
@@ -64,7 +64,7 @@ OVERALL  [+++++++++++++++++++++++++++------------------------------]  27/57 (47%
 | ✓ | OSINTote-35e.3 | Keys management UI — /settings page → keys tab, add/edit/delete API keys, status indicators (active/rate-limited/failed), encrypted masking |
 | ✓ | OSINTote-35e.4 | Settings management UI — /settings page, AI config editor (provider, models per role), default recipe selector, output format picker (JSON/Markdown/HTML), theme toggle |
 | ✓ | OSINTote-35e.5 | Documentation — README, getting-started, cli-reference, web-ui-guide, security, faq, api-reference, recipes, 5 ADRs |
-| ✓ | OSINTote-35e.6 | Final integration & demo — end-to-end test: target → DNS → HTTP probe → results |
+| **○** | OSINTote-35e.6 | Final integration & demo — end-to-end test: target → DNS → HTTP → results → report, full CLI + web UI flow, screenshot documentation, release checklist, CHANGELOG.md v0.1.0 |
 | ✓ | OSINTote-35e.7 | Callback system — Notifier.run_command(), CLI --on-complete flag, safe shell execution (shlex + subprocess_exec), HMAC-SHA256 webhook signing |
 | ✓ | OSINTote-35e.8 | Docker multi-stage build — Stage 1: Node frontend build, Stage 2: Python FastAPI (uvicorn + gunicorn) |
 | ✓ | OSINTote-35e.9 | Testing infrastructure — unit tests (engine logic, models, crypto, router, CLI, database, API), integration tests (route registration, health endpoint, DB setup) |
@@ -81,7 +81,7 @@ OVERALL  [+++++++++++++++++++++++++++------------------------------]  27/57 (47%
 | **o** | OSINTote-jcz | Epic: Data Sources — DNS, HTTP probe, WHOIS, CLI wrappers, API sources |
 | **o** | OSINTote-jcz.1 | DNS enumeration stage — built-in dnspython resolver + subfinder CLI wrapper |
 | **o** | OSINTote-jcz.2 | nmap wrapper — port scanning (-Pn -sV -T timing -p ports), XML output, async subprocess |
-| **o** | OSINTote-jcz.3 | HTTP probing stage — httpx alive host discovery, concurrency config, response analysis (status codes, content length, headers) |
+| ✓ | OSINTote-jcz.3 | HTTP probing stage — httpx alive host discovery, timeout, status code filtering, response headers capture (server, CSP, HSTS, content-type) |
 | **o** | OSINTote-jcz.4 | VirusTotal API source — httpx API calls, rate limiting (4/min), malware classification |
 | **o** | OSINTote-jcz.5 | CLI wrapper framework — async subprocess (asyncio.create_subprocess_exec), output capture, timeout handling |
 | **o** | OSINTote-jcz.6 | subfinder wrapper — subdomain enumeration via passive sources, output parsing |
@@ -101,7 +101,7 @@ OVERALL  [+++++++++++++++++++++++++++------------------------------]  27/57 (47%
 | **o** | OSINTote-2yq | Epic: Intelligence & AI — AI integration, context pruning, report generation, graph, natural language query |
 | **o** | OSINTote-2yq.1 | AI provider abstraction — AIProvider interface (analyze/query/suggest methods), OpenAICompatibleHTTP base class, provider-specific extensions (Ollama, LMStudio, llama.cpp, vLLM), auto-discovery via /v1/models |
 | **o** | OSINTote-2yq.2 | Webhook system — Webhook model, configurable endpoints (/api/webhook/{source}), HMAC-SHA256 verification |
-| **o** | OSINTote-2yq.3 | Report generation service — Reporter service, JSON export (always available), PDF export (reportlab/jinja2), HTML template, PDF styling (logo, colors, table formatting), /api/report/{task_id} endpoint |
+| ✓ | OSINTote-2yq.3 | Report generation service — Reporter service, JSON export (structured with summary), Markdown export (tables/summary/risk score), HTML export (vis.js network, search/filter, print CSS) |
 | **o** | OSINTote-2yq.4 | Relationship graph — vis.js Network with custom theming (node colors by type: IP=blue, domain=green, vuln=red, port=yellow), edge labels, zoom/pan, click-to-select |
 | **o** | OSINTote-2yq.5 | AI workflow suggestions — post-task recommendations list, critical findings alert, /api/suggest/{task_id} endpoint |
 | **o** | OSINTote-2yq.6 | AI query engine — NL→DSL→SQL pipeline, DSL parser/generator, AI intent extraction, SQL translation from DSL, result formatting with natural language summary, /api/ai/query endpoint |
@@ -113,24 +113,24 @@ OVERALL  [+++++++++++++++++++++++++++------------------------------]  27/57 (47%
 ## Key Dependencies
 
 ```
-35e.6 (Final Integration) ─── blocked by ──► yk2.3 ✓, yk2.7 ✓, 2yq.3, jcz.3, enz.5 ✓
+35e.6 (Final Integration) ─── blocked by ──► yk2.3 ✓, yk2.7 ✓, yk2.10 ✓, yk2.11 ✓, jcz.3 ✓, 2yq.3 ✓, enz.5 ✓
 2yq.1 (AI Provider) ─── blocked by ──► enz.1 ✓
 ```
 
 ## Recommended Next Steps
 
-1. **yk2.12** (CLI progress display) — complements yk2.3/4 live pipeline work
-2. **yk2.10** (Recipe system) — unlocks Pipeline & Engine usability
-3. **yk2.11** (Error handling) — needed for polished UX
-4. **yk2.8** (Write-ahead log) — engine durability foundation
-5. **jcz.3** (HTTP probing) — unblocks 35e.6 and enables 2yq.3
-6. **2yq.3** (Report generation) — unblocks 35e.6 (Final Integration)
-7. **jcz.1** (DNS enumeration) — first concrete data source to implement
+1. **yk2.12** (CLI progress display) — completes Pipeline & Engine epic
+2. **yk2.8** (Write-ahead log) — engine durability foundation
+3. **jcz.1** (DNS enumeration) — first concrete data source
+4. **jcz.5** (CLI wrapper framework) — unblocks jcz.1, jcz.2, jcz.6, jcz.7
+5. **jcz.9** (Target normalization) — unblocks jcz.1, jcz.3, 2yq.4
+6. **2yq.8** (AI analysis) — requires 2yq.7 (context pruning) first
+7. **35e.6** (Final Integration) — all dependencies now unblocked!
 
 ## Test Status
 
-- **250 tests passing**, 2 skipped, 2 warnings
-- Coverage across: engine, CLI, API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming
+- **272 tests passing**, 2 skipped, 2 warnings
+- Coverage across: engine, CLI, API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming, HTTP probe, error handling, recipes, reports
 
 ## Code Quality
 
