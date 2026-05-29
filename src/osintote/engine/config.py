@@ -17,11 +17,11 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 # ── generic helpers ──────────────────────────────────────────────────
+
 
 class BaseConfig(BaseSettings):
     """Base class for every per-source configuration.
@@ -442,7 +442,7 @@ class EngineConfig(BaseSettings):
             d[parts[-1]] = value
 
         # Merge with environment using nested delimiter
-        env_overrides = SettingsConfigDict(env_prefix="OSINTOTE_", env_nested_delimiter="__")
+        _env_overrides = SettingsConfigDict(env_prefix="OSINTOTE_", env_nested_delimiter="__")
         return cls(**nested)
 
     def as_dict(self, *, secrets: bool = False) -> dict:

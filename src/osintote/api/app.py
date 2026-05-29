@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 """OSINTote FastAPI application."""
 
-import asyncio
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -13,17 +13,15 @@ from osintote.__about__ import __version__
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> None:
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:  # type: ignore[return-type]
     """Application lifespan — run migrations at startup."""
     # Run Alembic migrations on startup
     try:
         from osintote.models.database import auto_migrate
 
-        asyncio.run(auto_migrate())
-    except Exception as e:
-        yield  # Still start the app even if migrations fail
-        return
-
+        await auto_migrate()
+    except Exception:
+        pass
     yield
 
 

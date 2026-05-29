@@ -3,15 +3,14 @@
 # SPDX-License-Identifier: MIT
 """Status command — show OSINTote system status."""
 
-import sys
 from pathlib import Path
 
 import typer
-from sqlmodel import Session, text
 from sqlalchemy import create_engine
+from sqlmodel import Session, text
 
 
-@typer.command()
+@typer.command()  # type: ignore[attr-defined, no-redef]
 def status() -> None:
     """Show OSINTote system status."""
     _status()
@@ -32,7 +31,14 @@ def _status() -> None:
     if db_exists:
         stats = _get_db_stats(db_path)
     else:
-        stats = {"targets": 0, "records": 0, "tasks": 0, "api_keys": 0, "webhooks": 0, "settings": 0}
+        stats = {
+            "targets": 0,
+            "records": 0,
+            "tasks": 0,
+            "api_keys": 0,
+            "webhooks": 0,
+            "settings": 0,
+        }
 
     # Version
     try:
@@ -63,7 +69,9 @@ def _status() -> None:
         box=None,
         padding=(0, 1),
     )
-    stats_table.add_row("[bold]Database[/]", f"[dim]{db_path}[/]" if db_exists else "[red]Not initialized[/]")
+    stats_table.add_row(
+        "[bold]Database[/]", f"[dim]{db_path}[/]" if db_exists else "[red]Not initialized[/]"
+    )
     stats_table.add_row("Targets", str(stats["targets"]))
     stats_table.add_row("Records", str(stats["records"]))
     stats_table.add_row("Tasks", str(stats["tasks"]))
@@ -82,14 +90,14 @@ def _get_db_stats(db_path: Path) -> dict[str, int]:
     """Query database for entity counts."""
     try:
         engine = create_engine(f"sqlite:///{db_path}")
-        with Session(engine) as session:
+        with Session(engine) as session:  # type: ignore[assignment]
             return {
-                "targets": session.exec(text("SELECT COUNT(*) FROM targets")).one(),
-                "records": session.exec(text("SELECT COUNT(*) FROM records")).one(),
-                "tasks": session.exec(text("SELECT COUNT(*) FROM tasks")).one(),
-                "api_keys": session.exec(text("SELECT COUNT(*) FROM api_keys")).one(),
-                "webhooks": session.exec(text("SELECT COUNT(*) FROM webhooks")).one(),
-                "settings": session.exec(text("SELECT COUNT(*) FROM settings")).one(),
+                "targets": session.exec(text("SELECT COUNT(*) FROM targets")).one(),  # type: ignore[arg-type, call-overload]
+                "records": session.exec(text("SELECT COUNT(*) FROM records")).one(),  # type: ignore[arg-type, call-overload]
+                "tasks": session.exec(text("SELECT COUNT(*) FROM tasks")).one(),  # type: ignore[arg-type, call-overload]
+                "api_keys": session.exec(text("SELECT COUNT(*) FROM api_keys")).one(),  # type: ignore[arg-type, call-overload]
+                "webhooks": session.exec(text("SELECT COUNT(*) FROM webhooks")).one(),  # type: ignore[arg-type, call-overload]
+                "settings": session.exec(text("SELECT COUNT(*) FROM settings")).one(),  # type: ignore[arg-type, call-overload]
             }
     except Exception:
         return {

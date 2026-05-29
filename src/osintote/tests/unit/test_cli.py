@@ -6,9 +6,7 @@
 from __future__ import annotations
 
 import json
-import sys
-from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -26,7 +24,9 @@ class TestCLIEntry:
         """Test that app has registered commands."""
         from osintote.cli import app
 
-        commands = [cmd.callback.__name__ if cmd.callback else None for cmd in app.registered_commands]
+        commands = [
+            cmd.callback.__name__ if cmd.callback else None for cmd in app.registered_commands
+        ]
         assert any(c for c in commands if c and "init" in c)
         assert any(c for c in commands if c and "serve" in c)
         assert any(c for c in commands if c and "status" in c)
@@ -158,9 +158,7 @@ class TestCLIMigrations:
     def test_init_handles_migration_error(self, cli_test_dir, monkeypatch):
         """Test that init handles migration errors gracefully."""
         monkeypatch.chdir(cli_test_dir)
-        with patch(
-            "osintote.cli.asyncio.run", side_effect=Exception("Migration failed")
-        ):
+        with patch("osintote.cli.asyncio.run", side_effect=Exception("Migration failed")):
             from osintote.cli import app
 
             with pytest.raises(SystemExit) as exc_info:

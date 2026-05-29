@@ -1,21 +1,23 @@
 """init schema
 
 Revision ID: 40e6cfdaff1a
-Revises: 
+Revises:
 Create Date: 2026-05-28 17:06:25.759464
 
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
 from sqlalchemy.dialects import sqlite
 
+from alembic import op
+
 # revision identifiers, used by Alembic.
 revision: str = "40e6cfdaff1a"
-down_revision: Union[str, Sequence[str], None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -49,7 +51,10 @@ def upgrade() -> None:
         sa.Column("data", sqlite.JSON(), nullable=False),
         sa.Column("metadata_", sqlite.JSON(), nullable=False),
         sa.Column("confidence", sa.INTEGER(), nullable=False),
-        sa.ForeignKeyConstraint(["target_id"], ["targets.id"], ),
+        sa.ForeignKeyConstraint(
+            ["target_id"],
+            ["targets.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("target_id", "type", "source"),
     )
@@ -72,7 +77,10 @@ def upgrade() -> None:
         sa.Column("result", sqlite.JSON(), nullable=False),
         sa.Column("started_at", sa.TIMESTAMP(), nullable=True),
         sa.Column("completed_at", sa.TIMESTAMP(), nullable=True),
-        sa.ForeignKeyConstraint(["target_id"], ["targets.id"], ),
+        sa.ForeignKeyConstraint(
+            ["target_id"],
+            ["targets.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name", "target_id"),
     )
@@ -91,7 +99,10 @@ def upgrade() -> None:
         sa.Column("encrypted", sa.BOOLEAN(), nullable=False),
         sa.Column("fallback", sa.BOOLEAN(), nullable=False),
         sa.Column("primary", sa.BOOLEAN(), nullable=False),
-        sa.ForeignKeyConstraint(["target_id"], ["targets.id"], ),
+        sa.ForeignKeyConstraint(
+            ["target_id"],
+            ["targets.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("source", "name"),
     )
@@ -121,8 +132,14 @@ def upgrade() -> None:
         sa.Column("source_id", sa.CHAR(length=32), nullable=False),
         sa.Column("target_id", sa.CHAR(length=32), nullable=False),
         sa.Column("type", sa.VARCHAR(length=13), nullable=False),
-        sa.ForeignKeyConstraint(["source_id"], ["targets.id"], ),
-        sa.ForeignKeyConstraint(["target_id"], ["targets.id"], ),
+        sa.ForeignKeyConstraint(
+            ["source_id"],
+            ["targets.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["target_id"],
+            ["targets.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("source_id", "target_id", "type"),
     )
@@ -138,7 +155,10 @@ def upgrade() -> None:
         sa.Column("message", sa.TEXT(), nullable=False),
         sa.Column("meta", sqlite.JSON(), nullable=False),
         sa.Column("task_id", sa.CHAR(length=32), nullable=True),
-        sa.ForeignKeyConstraint(["task_id"], ["tasks.id"], ),
+        sa.ForeignKeyConstraint(
+            ["task_id"],
+            ["tasks.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("errors", schema=None) as batch_op:
@@ -171,8 +191,14 @@ def upgrade() -> None:
         sa.Column("meta", sqlite.JSON(), nullable=False),
         sa.Column("task_id", sa.CHAR(length=32), nullable=True),
         sa.Column("target_id", sa.CHAR(length=32), nullable=True),
-        sa.ForeignKeyConstraint(["task_id"], ["tasks.id"], ),
-        sa.ForeignKeyConstraint(["target_id"], ["targets.id"], ),
+        sa.ForeignKeyConstraint(
+            ["task_id"],
+            ["tasks.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["target_id"],
+            ["targets.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
     with op.batch_alter_table("logs", schema=None) as batch_op:

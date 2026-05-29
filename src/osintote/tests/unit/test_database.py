@@ -17,7 +17,6 @@ from osintote.models.database import (
     get_async_session,
     init_db,
 )
-from sqlmodel import SQLModel
 
 
 class TestDatabaseSetup:
@@ -58,6 +57,7 @@ class TestInitDB:
     def test_init_db_creates_tables(self, tmp_path: str):
         """Test that init_db creates all tables."""
         import os
+
         db_file = os.path.join(tmp_path, "init_test.db")
         db_url = f"sqlite+pysqlite:///{db_file}"
         # Monkeypatch DATABASE_URL
@@ -72,6 +72,7 @@ class TestInitDB:
     def test_init_db_with_memory_db(self, tmp_path: str):
         """Test init_db with temporary database."""
         import os
+
         db_file = os.path.join(tmp_path, "test_init.db")
         db_url = f"sqlite+pysqlite:///{db_file}"
         original_url = db_module.DATABASE_URL
@@ -89,6 +90,7 @@ class TestInitDB:
     def test_init_db_no_tables_before(self, tmp_path: str):
         """Test that init_db does not fail when no tables exist."""
         import os
+
         db_file = os.path.join(tmp_path, "test_no_tables.db")
         db_url = f"sqlite+pysqlite:///{db_file}"
         original_url = db_module.DATABASE_URL
@@ -108,6 +110,7 @@ class TestSessionDependency:
     async def test_get_async_session_returns_async_gen(self):
         """Test that get_async_session returns an async generator."""
         import inspect
+
         result = get_async_session()
         assert inspect.isasyncgen(result)
 

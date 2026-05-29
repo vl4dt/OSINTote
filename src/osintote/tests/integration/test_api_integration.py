@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestAPIStructure:
     """Integration tests that test the full stack."""
@@ -36,7 +34,7 @@ class TestAPIStructure:
         schema = app.openapi()
         paths = schema.get("paths", {})
         # Find health endpoint path (could be /api/health or similar)
-        health_paths = [p for p in paths.keys() if "health" in p]
+        health_paths = [p for p in paths if "health" in p]
         assert len(health_paths) > 0
 
     def test_app_has_info(self):

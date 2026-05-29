@@ -20,7 +20,6 @@ from osintote.crypto import (
     verify_password,
 )
 
-
 # ---------------------------------------------------------------------------
 # derive_key
 # ---------------------------------------------------------------------------
@@ -53,8 +52,8 @@ class TestDeriveKey:
         assert key1 != key2
 
     def test_salt_generated_if_none(self) -> None:
-        key1, salt1 = derive_key("password")
-        key2, salt2 = derive_key("password")
+        _key1, salt1 = derive_key("password")
+        _key2, salt2 = derive_key("password")
         assert salt1 != salt2
 
     def test_iterations_600k(self) -> None:
@@ -89,7 +88,7 @@ class TestEncryptDecrypt:
 
     def test_roundtrip_unicode(self) -> None:
         key = b"0" * 32
-        data = "こんにちは世界".encode("utf-8")
+        data = "こんにちは世界".encode()
         blob = encrypt_data(data, key)
         assert decrypt_data(blob, key) == data
 
@@ -159,10 +158,10 @@ class TestEncryptedBlob:
     def test_magic_bytes_in_pack(self) -> None:
         blob = encrypt_data(b"data", b"0" * 32)
         packed = blob._pack()
-        assert packed[:len(blob.MAGIC)] == blob.MAGIC
+        assert packed[: len(blob.MAGIC)] == blob.MAGIC
 
     def test_invalid_base64_raises(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             EncryptedBlob.decode("not-valid-base64!!!")
 
 
@@ -282,10 +281,10 @@ class TestEncryptionManager:
 
     def test_key_cached_until_cleared(self) -> None:
         mgr = EncryptionManager(password="master")
-        key1 = mgr.key
+        _key1 = mgr.key
         assert mgr._key is not None
         mgr._key = None
-        key2 = mgr.key  # re-derives (different salt, different key)
+        _key2 = mgr.key  # re-derives (different salt, different key)
         assert mgr._key is not None
         # Keys differ because derive_key generates new random salt each time
         # (this is intentional for security)

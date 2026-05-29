@@ -73,8 +73,9 @@ def _init_project(db_path: str, force: bool) -> None:
 
     # Initialize database
     try:
-        from osintote.models.database import auto_migrate, init_db
         import asyncio
+
+        from osintote.models.database import auto_migrate, init_db
 
         console.print(f"[blue]•[/] Database file: [dim]{db_file}[/]")
 
@@ -83,7 +84,7 @@ def _init_project(db_path: str, force: bool) -> None:
             from sqlalchemy import create_engine as sync_create_engine
 
             sync_url = f"sqlite:///{db_file}"
-            sync_engine = sync_create_engine(sync_url)
+            sync_create_engine(sync_url)
             init_db()
             console.print(f"[green]✓[/] Database initialized at [dim]{db_file}[/]")
         else:

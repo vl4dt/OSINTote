@@ -2,27 +2,23 @@
 
 from __future__ import annotations
 
-import os
 import json
-from pathlib import Path
 
 import pytest
-from pydantic import SecretStr
 
 from osintote.engine.config import (
-    EngineConfig,
-    ShodanConfig,
-    CensysConfig,
-    VirusTotalConfig,
-    NmapConfig,
-    SubfinderConfig,
-    NucleiConfig,
-    WhoisConfig,
-    DNSConfig,
-    HTTPConfig,
     AIClientConfig,
+    CensysConfig,
+    DNSConfig,
+    EngineConfig,
+    HTTPConfig,
+    NmapConfig,
+    NucleiConfig,
+    ShodanConfig,
+    SubfinderConfig,
+    VirusTotalConfig,
+    WhoisConfig,
 )
-
 
 # ── default values ──────────────────────────────────────────────────
 
@@ -124,7 +120,7 @@ class TestEnvVars:
     """Verify os.environ → Pydantic BaseSettings resolution."""
 
     def test_env_prefix_osintote_shodan(self) -> None:
-        env = {"OSINTOTE_SHODAN_API_KEY": "test-shodan-key-123"}
+        _env = {"OSINTOTE_SHODAN_API_KEY": "test-shodan-key-123"}
         with pytest.MonkeyPatch.context() as mp:
             mp.setenv("OSINTOTE_SHODAN_API_KEY", "test-shodan-key-123")
             cfg = ShodanConfig()
@@ -132,7 +128,7 @@ class TestEnvVars:
             assert cfg.api_key.get_secret_value() == "test-shodan-key-123"
 
     def test_env_prefix_osintote_censys(self) -> None:
-        env = {
+        _env = {
             "OSINTOTE_CENSYS_API_KEY": "censys-user",
             "OSINTOTE_CENSYS_API_SECRET": "censys-secret",
         }

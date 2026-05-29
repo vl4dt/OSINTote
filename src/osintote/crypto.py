@@ -21,23 +21,21 @@ from __future__ import annotations
 import base64
 import hashlib
 import json
-import os
 import secrets
 import struct
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
 # PBKDF2 parameters
-SALT_SIZE = 32           # 256-bit salt
-ITERATIONS = 600_000     # OWASP 2023 recommendation for PBKDF2-HMAC-SHA256
-KEY_SIZE = 32            # 256-bit key (AES-256)
-TAG_SIZE = 16            # 128-bit GCM auth tag
-IV_SIZE = 12             # 96-bit GCM nonce
+SALT_SIZE = 32  # 256-bit salt
+ITERATIONS = 600_000  # OWASP 2023 recommendation for PBKDF2-HMAC-SHA256
+KEY_SIZE = 32  # 256-bit key (AES-256)
+TAG_SIZE = 16  # 128-bit GCM auth tag
+IV_SIZE = 12  # 96-bit GCM nonce
 MAGIC = b"OSINTOTE-AES256GCM"  # magic bytes for file format detection
 
 
@@ -78,7 +76,7 @@ class EncryptedBlob:
         return cls._unpack(raw)
 
     @property
-    def MAGIC(self) -> bytes:
+    def MAGIC(self) -> bytes:  # noqa: N802
         """Magic bytes for format detection."""
         return MAGIC
 
@@ -93,13 +91,13 @@ class EncryptedBlob:
         magic_len = len(MAGIC)
         magic = raw[:magic_len]
         assert magic == MAGIC, f"Bad magic: {magic!r}"
-        salt_len, iv_len, ct_len = struct.unpack("!III", raw[magic_len:magic_len + 12])
+        salt_len, iv_len, ct_len = struct.unpack("!III", raw[magic_len : magic_len + 12])
         offset = magic_len + 12
-        salt = raw[offset:offset + salt_len]
+        salt = raw[offset : offset + salt_len]
         offset += salt_len
-        iv = raw[offset:offset + iv_len]
+        iv = raw[offset : offset + iv_len]
         offset += iv_len
-        ciphertext = raw[offset:offset + ct_len]
+        ciphertext = raw[offset : offset + ct_len]
         offset += ct_len
         tag = raw[offset:]
         return cls(ciphertext=ciphertext, iv=iv, tag=tag, salt=salt)
@@ -272,7 +270,7 @@ class KeyStorage:
     def _load(self) -> dict:
         """Load the keys file, creating it if absent."""
         if self.keys_file.exists():
-            with open(self.keys_file, "r", encoding="utf-8") as f:
+            with open(self.keys_file, encoding="utf-8") as f:
                 data = json.load(f)
         else:
             data = {"version": 1, "keys": {}}
@@ -367,8 +365,11 @@ class EncryptionManager:
         try:
             # Derive key with the stored PBKDF2 salt
             key = hashlib.pbkdf2_hmac(
-                "sha256", self._password.encode("utf-8"),
-                blob.salt, ITERATIONS, dklen=KEY_SIZE,
+                "sha256",
+                self._password.encode("utf-8"),
+                blob.salt,
+                ITERATIONS,
+                dklen=KEY_SIZE,
             )
             decrypt_data(blob, key)
             return True
@@ -382,8 +383,11 @@ class EncryptionManager:
             return False
         try:
             key = hashlib.pbkdf2_hmac(
-                "sha256", password.encode("utf-8"),
-                blob.salt, ITERATIONS, dklen=KEY_SIZE,
+                "sha256",
+                password.encode("utf-8"),
+                blob.salt,
+                ITERATIONS,
+                dklen=KEY_SIZE,
             )
             decrypt_data(blob, key)
             return True

@@ -25,11 +25,10 @@ import logging
 import logging.handlers
 import os
 import sys
-import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -40,13 +39,13 @@ def _safe_json(obj: Any) -> str:
     """Serialize an object to a JSON string, handling non-serialisable types."""
     try:
         return json.dumps(obj, default=str, ensure_ascii=False)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return json.dumps(str(obj), ensure_ascii=False)
 
 
 def _iso_now() -> str:
     """Return an ISO-8601 UTC timestamp string."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 # ---------------------------------------------------------------------------
@@ -105,21 +104,41 @@ class JSONFormatter(logging.Formatter):
             meta_keys = {"task_id", "stage", "timestamp"}
             meta: dict[str, Any] = {}
             for key, val in record.__dict__.items():
-                if key in meta_keys or key in {"name", "msg", "args", "levelname",
-                                                "levelno", "pathname", "filename",
-                                                "module", "exc_info", "exc_text",
-                                                "stack_info", "lineno", "funcName",
-                                                "created", "msecs", "relativeCreated",
-                                                "thread", "threadName", "processName",
-                                                "message", "getMessage", "pid",
-                                                "recorded", "task", "stage",
-                                                "timestamp", "task_id", "stage",
-                                                "logger"}:
+                if key in meta_keys or key in {
+                    "name",
+                    "msg",
+                    "args",
+                    "levelname",
+                    "levelno",
+                    "pathname",
+                    "filename",
+                    "module",
+                    "exc_info",
+                    "exc_text",
+                    "stack_info",
+                    "lineno",
+                    "funcName",
+                    "created",
+                    "msecs",
+                    "relativeCreated",
+                    "thread",
+                    "threadName",
+                    "processName",
+                    "message",
+                    "getMessage",
+                    "pid",
+                    "recorded",
+                    "task",
+                    "stage",
+                    "timestamp",
+                    "task_id",
+                    "logger",
+                }:
                     continue
                 if not key.startswith("_"):
                     try:
                         json.dumps(val)  # only include JSON-safe values
-                    except (TypeError, ValueError):
+                    except TypeError, ValueError:
                         continue
                     meta[key] = val
             if meta:

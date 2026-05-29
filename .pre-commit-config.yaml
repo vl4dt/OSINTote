@@ -21,6 +21,7 @@ repos:
           - sqlalchemy>=2.0.50
           - sqlmodel>=0.0.38
         args: [--ignore-missing-imports]
+        exclude: "^src/osintote/tests/"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -31,5 +32,3 @@ repos:
       - id: check-added-large-files
         args: ["--maxkb=1024"]
       - id: check-merge-conflict
-
-

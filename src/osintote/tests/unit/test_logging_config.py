@@ -7,9 +7,8 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -20,7 +19,6 @@ from osintote.logging_config import (
     get_logger,
     setup_logging,
 )
-
 
 # ---------------------------------------------------------------------------
 # _safe_json
@@ -66,7 +64,9 @@ class TestJSONFormatter:
             exc_info=None,
         )
 
-    def test_format_contains_required_fields(self, record: logging.LogRecord, formatter: JSONFormatter) -> None:
+    def test_format_contains_required_fields(
+        self, record: logging.LogRecord, formatter: JSONFormatter
+    ) -> None:
         line = formatter.format(record)
         obj = json.loads(line)
         assert "timestamp" in obj
@@ -98,8 +98,13 @@ class TestJSONFormatter:
     def test_format_without_meta(self) -> None:
         fmt = JSONFormatter(include_meta=False)
         record = logging.LogRecord(
-            name="test", level=logging.WARNING, pathname="test.py",
-            lineno=1, msg="warning", args=(), exc_info=None,
+            name="test",
+            level=logging.WARNING,
+            pathname="test.py",
+            lineno=1,
+            msg="warning",
+            args=(),
+            exc_info=None,
         )
         record.custom = "val"
         line = fmt.format(record)
@@ -109,16 +114,26 @@ class TestJSONFormatter:
     def test_format_with_indent(self) -> None:
         fmt = JSONFormatter(indent=2)
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="info", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="info",
+            args=(),
+            exc_info=None,
         )
         line = fmt.format(record)
         assert "\n" in line  # indented output has newlines
 
     def test_multiple_records(self, record: logging.LogRecord, formatter: JSONFormatter) -> None:
         record2 = logging.LogRecord(
-            name="osintote.test", level=logging.ERROR, pathname="test.py",
-            lineno=99, msg="error occurred", args=(), exc_info=None,
+            name="osintote.test",
+            level=logging.ERROR,
+            pathname="test.py",
+            lineno=99,
+            msg="error occurred",
+            args=(),
+            exc_info=None,
         )
         line1 = formatter.format(record)
         line2 = formatter.format(record2)
@@ -142,8 +157,13 @@ class TestSSELogHandler:
 
     def test_emit_stores_event(self, handler: SSELogHandler) -> None:
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="sse test", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="sse test",
+            args=(),
+            exc_info=None,
         )
         record.task_id = "task-1"
         record.stage = "stream"
@@ -155,8 +175,13 @@ class TestSSELogHandler:
 
     def test_flush_clears_queue(self, handler: SSELogHandler) -> None:
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="flush test", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="flush test",
+            args=(),
+            exc_info=None,
         )
         handler.emit(record)
         handler.emit(record)
@@ -167,8 +192,13 @@ class TestSSELogHandler:
 
     def test_get_events_returns_events(self, handler: SSELogHandler) -> None:
         record = logging.LogRecord(
-            name="test", level=logging.DEBUG, pathname="test.py",
-            lineno=1, msg="debug msg", args=(), exc_info=None,
+            name="test",
+            level=logging.DEBUG,
+            pathname="test.py",
+            lineno=1,
+            msg="debug msg",
+            args=(),
+            exc_info=None,
         )
         handler.emit(record)
         events = handler.get_events()
@@ -177,8 +207,13 @@ class TestSSELogHandler:
 
     def test_get_events_clears(self, handler: SSELogHandler) -> None:
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="clear test", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="clear test",
+            args=(),
+            exc_info=None,
         )
         handler.emit(record)
         handler.get_events()
@@ -193,8 +228,13 @@ class TestSSELogHandler:
     def test_error_handling(self, handler: SSELogHandler) -> None:
         # Corrupt record should not crash the handler
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="ok", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="ok",
+            args=(),
+            exc_info=None,
         )
         record.getMessage = MagicMock(side_effect=RuntimeError("boom"))
         # Should not raise
@@ -242,8 +282,13 @@ class TestGetLogger:
         logger = get_logger("test.emit", level=logging.DEBUG, log_file=log_file)
         # Create a record and emit it manually (since Logger.info doesn't accept **kwargs)
         record = logging.LogRecord(
-            name="test.emit", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="test message", args=(), exc_info=None,
+            name="test.emit",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="test message",
+            args=(),
+            exc_info=None,
         )
         record.task_id = "t1"
         record.stage = "test"
@@ -259,8 +304,13 @@ class TestGetLogger:
         log_file = tmp_path / "logs" / "created.jsonl"
         logger = get_logger("test.create", log_file=log_file)
         record = logging.LogRecord(
-            name="test.create", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="hi", args=(), exc_info=None,
+            name="test.create",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="hi",
+            args=(),
+            exc_info=None,
         )
         for h in logger.handlers:
             h.emit(record)
@@ -270,8 +320,13 @@ class TestGetLogger:
         # Without log_file, only console handler is added; no disk write
         logger = get_logger("test.no_file")
         record = logging.LogRecord(
-            name="test.no_file", level=logging.INFO, pathname="test.py",
-            lineno=1, msg="default test", args=(), exc_info=None,
+            name="test.no_file",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="default test",
+            args=(),
+            exc_info=None,
         )
         for h in logger.handlers:
             h.emit(record)
@@ -331,8 +386,13 @@ class TestIntegration:
         # Emit records manually (Logger.info doesn't accept **kwargs for extras)
         def emit(msg: str, level: int, meta: dict | None = None) -> None:
             rec = logging.LogRecord(
-                name="osintote.integration", level=level,
-                pathname="test.py", lineno=1, msg=msg, args=(), exc_info=None,
+                name="osintote.integration",
+                level=level,
+                pathname="test.py",
+                lineno=1,
+                msg=msg,
+                args=(),
+                exc_info=None,
             )
             rec.task_id = "int-001"
             rec.stage = "pipeline"
@@ -347,7 +407,7 @@ class TestIntegration:
         emit("pipeline error", logging.ERROR, {})
 
         out = capsys.readouterr()
-        lines = [l for l in out.out.strip().split("\n") if l]
+        lines = [line for line in out.out.strip().split("\n") if line]
         assert len(lines) >= 1  # console output
 
         # File should have all 3 records
@@ -364,9 +424,6 @@ class TestIntegration:
     def test_file_rotation_config(self, tmp_path: Path) -> None:
         log_file = tmp_path / "logs" / "rotation.jsonl"
         logger = get_logger("test.rotation", log_file=log_file, max_bytes=1024, backup_count=3)
-        handler = next(
-            h for h in logger.handlers
-            if hasattr(h, "maxBytes")
-        )
+        handler = next(h for h in logger.handlers if hasattr(h, "maxBytes"))
         assert handler.maxBytes == 1024  # type: ignore[attr-defined]
         assert handler.backupCount == 3  # type: ignore[attr-defined]

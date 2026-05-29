@@ -68,7 +68,7 @@ class Base(DeclarativeBase):
 # ── session dependency ───────────────────────────────────────────────
 
 
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_async_session() -> AsyncGenerator[AsyncSession]:
     """FastAPI dependency for async database sessions.
 
     Yields a session and ensures it is closed after the request.
@@ -91,8 +91,8 @@ async def auto_migrate() -> None:
     """
     import asyncio
 
-    from alembic.config import Config
     from alembic.command import upgrade as alembic_upgrade
+    from alembic.config import Config
 
     alembic_cfg = Config("alembic.ini")
     await asyncio.to_thread(alembic_upgrade, alembic_cfg, "head")
@@ -105,7 +105,6 @@ def init_db() -> None:
     This function is provided as a quick way to bootstrap the database
     for local development without running migrations.
     """
-    import asyncio
 
     # Use sync engine for table creation (simpler for SQLite)
     from sqlalchemy import create_engine as sync_create_engine

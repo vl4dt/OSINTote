@@ -8,7 +8,7 @@ import asyncio
 import typer
 
 
-@typer.command()
+@typer.command()  # type: ignore[attr-defined, no-redef]
 def serve(
     host: str = typer.Option(
         "127.0.0.1",
@@ -37,7 +37,6 @@ def _serve(host: str, port: int, reload: bool) -> None:
     """Start the uvicorn web server."""
     import uvicorn
     from rich.console import Console
-    from rich.panel import Panel
 
     console = Console()
 

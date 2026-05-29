@@ -6,8 +6,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
-import sqlite3
 from pathlib import Path
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock
@@ -20,20 +18,14 @@ from sqlmodel import SQLModel
 
 from osintote.api.app import app
 from osintote.crypto import EncryptionManager, KeyStorage
-from osintote.models.database import AsyncSessionLocal, engine as async_engine
+from osintote.models.database import AsyncSessionLocal
 from osintote.models.orm import (
     ApiKey,
-    Error,
-    Log,
-    ModelBase,
     Record,
-    Relationship,
     Setting,
     Target,
     Task,
-    Webhook,
 )
-
 
 # ── Database fixtures ────────────────────────────────────────────────────────
 

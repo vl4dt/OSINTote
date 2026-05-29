@@ -20,7 +20,7 @@
 
 	// Update clock (browser only)
 	let clockInterval: ReturnType<typeof setInterval> | null = null;
-	
+
 	if (browser) {
 		function updateClock() {
 			const el = document.getElementById('clock');

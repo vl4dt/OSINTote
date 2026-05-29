@@ -10,41 +10,32 @@ Tests cover:
 
 from __future__ import annotations
 
-import pytest
+from datetime import UTC, datetime
 from uuid import uuid4
-from datetime import datetime, timezone
 
-from sqlmodel import SQLModel, Session, select
+import pytest
 from sqlalchemy import create_engine
+from sqlmodel import Session, SQLModel, select
 
 from osintote.models.orm import (
-    # Models
-    Target,
-    Record,
-    Task,
     ApiKey,
-    Setting,
-    Relationship,
     Error,
-    Webhook,
     ModelBase,
-    # Enums
-    TaskStatus,
+    Record,
+    RecordCreate,
     RecordType,
+    Relationship,
     RelationshipType,
+    Setting,
+    Target,
     # Schemas
     TargetCreate,
-    TargetUpdate,
     TargetRead,
-    RecordCreate,
-    TaskCreate,
-    ApiKeyCreate,
-    SettingCreate,
-    RelationshipCreate,
-    ErrorCreate,
-    WebhookCreate,
+    TargetUpdate,
+    Task,
+    TaskStatus,
+    Webhook,
 )
-
 
 # ── fixture: in-memory SQLite database ──────────────────────────────
 
@@ -172,7 +163,7 @@ class TestPydanticSchemas:
         assert schema.tags == ["test"]
 
     def test_target_create_min_length(self) -> None:
-        with pytest.raises(Exception):  # Pydantic validation error
+        with pytest.raises(Exception):  # noqa: B017
             TargetCreate(name="", type="domain")
 
     def test_target_update_optional(self) -> None:
@@ -282,13 +273,13 @@ class TestTaskModel:
         # Start task
         task.status = TaskStatus.RUNNING
         task.progress = 0.1
-        task.started_at = datetime.now(timezone.utc)
+        task.started_at = datetime.now(UTC)
         session.commit()
 
         # Complete task
         task.status = TaskStatus.COMPLETED
         task.progress = 1.0
-        task.completed_at = datetime.now(timezone.utc)
+        task.completed_at = datetime.now(UTC)
         task.result = {"found": 5}
         session.commit()
         session.refresh(task)
@@ -363,7 +354,7 @@ class TestSettingModel:
         setting2 = Setting(key="test.key", value={"b": 2})
         session.add(setting2)
 
-        with pytest.raises(Exception):  # IntegrityError
+        with pytest.raises(Exception):  # noqa: B017
             session.commit()
 
 
@@ -446,7 +437,7 @@ class TestRelationships:
 
     def test_target_has_records(self, session: Session) -> None:
         target = Target(name="example.com", type="domain")
-        record = Record(
+        _record = Record(
             target=target,
             type=RecordType.DNS,
             source="test",
@@ -461,7 +452,7 @@ class TestRelationships:
 
     def test_task_belongs_to_target(self, session: Session) -> None:
         target = Target(name="example.com", type="domain")
-        task = Task(
+        _task = Task(
             target=target,
             name="Test task",
         )

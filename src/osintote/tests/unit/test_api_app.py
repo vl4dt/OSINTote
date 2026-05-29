@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 class TestLifespan:
     """Tests for application lifespan."""
@@ -52,6 +50,7 @@ class TestFastAPISettings:
     def test_app_cors_configured(self):
         """Test that CORS middleware is configured."""
         from starlette.middleware.cors import CORSMiddleware
+
         from osintote.api.app import app
 
         # Check that CORSMiddleware is in the app's middleware stack

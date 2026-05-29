@@ -7,8 +7,9 @@ import asyncio
 import sys
 from pathlib import Path
 
-from osintote.__about__ import __version__
 from typer import Option, Typer
+
+from osintote.__about__ import __version__
 
 app = Typer(
     name="osintote",
@@ -44,9 +45,9 @@ def _init_project(db_path: str, force: bool) -> None:
     # Create .osintote directory
     if not config_dir.exists():
         config_dir.mkdir(parents=True)
-        console.print("[green]OK[/] Created [dim]{path}[/]".format(path=config_dir))
+        console.print(f"[green]OK[/] Created [dim]{config_dir}[/]")
     else:
-        console.print("[blue]--[/] [dim]{path}[/] already exists".format(path=config_dir))
+        console.print(f"[blue]--[/] [dim]{config_dir}[/] already exists")
 
     # Create default config
     if not config_file.exists() or force:
@@ -64,27 +65,27 @@ def _init_project(db_path: str, force: bool) -> None:
             f'  "listen_port": {default_config["listen_port"]}\n'
             "}\n"
         )
-        console.print("[green]OK[/] Created [dim]{path}[/]".format(path=config_file))
+        console.print(f"[green]OK[/] Created [dim]{config_file}[/]")
 
     # Initialize database
     try:
         from osintote.models.database import auto_migrate
 
-        console.print("[blue]--[/] Database file: [dim]{path}[/]".format(path=db_file))
+        console.print(f"[blue]--[/] Database file: [dim]{db_file}[/]")
 
         if db_file.exists() and not force:
-            console.print("[blue]--[/] Database exists at [dim]{path}[/]".format(path=db_file))
+            console.print(f"[blue]--[/] Database exists at [dim]{db_file}[/]")
         else:
-            console.print("[blue]--[/] Creating new database at [dim]{path}[/]".format(path=db_file))
+            console.print(f"[blue]--[/] Creating new database at [dim]{db_file}[/]")
 
         asyncio.run(auto_migrate())
         console.print("[green]OK[/] Migrations applied")
 
     except ImportError as e:
-        console.print("[red]FAIL[/] Failed to import models: {e}".format(e=e))
+        console.print(f"[red]FAIL[/] Failed to import models: {e}")
         sys.exit(1)
     except Exception as e:
-        console.print("[red]FAIL[/] Database error: {e}".format(e=e))
+        console.print(f"[red]FAIL[/] Database error: {e}")
         sys.exit(1)
 
     # Summary
@@ -105,8 +106,8 @@ def _status() -> None:
     from rich.console import Console
     from rich.panel import Panel
     from rich.table import Table
-    from sqlmodel import Session, text
     from sqlalchemy import create_engine
+    from sqlmodel import Session, text
 
     console = Console()
 
@@ -127,9 +128,23 @@ def _status() -> None:
                     "settings": session.scalar(text("SELECT COUNT(*) FROM settings")),
                 }
         except Exception:
-            stats = {"targets": 0, "records": 0, "tasks": 0, "api_keys": 0, "webhooks": 0, "settings": 0}
+            stats = {
+                "targets": 0,
+                "records": 0,
+                "tasks": 0,
+                "api_keys": 0,
+                "webhooks": 0,
+                "settings": 0,
+            }
     else:
-        stats = {"targets": 0, "records": 0, "tasks": 0, "api_keys": 0, "webhooks": 0, "settings": 0}
+        stats = {
+            "targets": 0,
+            "records": 0,
+            "tasks": 0,
+            "api_keys": 0,
+            "webhooks": 0,
+            "settings": 0,
+        }
 
     # Version
     try:
@@ -158,7 +173,9 @@ def _status() -> None:
         box=None,
         padding=(0, 1),
     )
-    stats_table.add_row("[bold]Database[/]", f"[dim]{db_path}[/]" if db_exists else "[red]Not initialized[/]")
+    stats_table.add_row(
+        "[bold]Database[/]", f"[dim]{db_path}[/]" if db_exists else "[red]Not initialized[/]"
+    )
     stats_table.add_row("Targets", str(stats["targets"]))
     stats_table.add_row("Records", str(stats["records"]))
     stats_table.add_row("Tasks", str(stats["tasks"]))
@@ -176,7 +193,9 @@ def _status() -> None:
 @app.command()
 def init(
     force: bool = Option(False, "--force", help="Overwrite existing files"),
-    db_path: str = Option("osintote.db", "--db-path", "-d", help="Path to the SQLite database file"),
+    db_path: str = Option(
+        "osintote.db", "--db-path", "-d", help="Path to the SQLite database file"
+    ),
 ) -> None:
     """Initialize OSINTote project."""
     _init_project(db_path, force)
@@ -193,7 +212,7 @@ def serve(
     from rich.console import Console
 
     console = Console()
-    console.print("[blue]--[/] Starting server at [dim]http://{host}:{port}[/]".format(host=host, port=port))
+    console.print(f"[blue]--[/] Starting server at [dim]http://{host}:{port}[/]")
 
     # Run migrations before starting
     try:
@@ -202,7 +221,7 @@ def serve(
         asyncio.run(auto_migrate())
         console.print("[green]OK[/] Migrations applied")
     except Exception as e:
-        console.print("[yellow]WARN[/] Migration warning: {e}".format(e=e))
+        console.print(f"[yellow]WARN[/] Migration warning: {e}")
 
     uvicorn.run(
         "osintote.api.app:app",
