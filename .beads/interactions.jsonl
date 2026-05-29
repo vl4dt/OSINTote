@@ -30,3 +30,4 @@
 {"id":"int-745f63ec","kind":"field_change","created_at":"2026-05-29T03:05:13.782167Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.2","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-f4bdeeec","kind":"field_change","created_at":"2026-05-29T03:11:55.2680579Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.3","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-534693fc","kind":"field_change","created_at":"2026-05-29T03:38:02.9075902Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.4","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-031d9a7f","kind":"field_change","created_at":"2026-05-29T03:51:11.6308196Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-yk2.11","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}

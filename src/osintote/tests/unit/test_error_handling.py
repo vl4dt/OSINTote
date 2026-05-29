@@ -2,10 +2,8 @@
 # SPDX-License-Identifier: MIT
 """Tests for error handling framework."""
 
-from unittest.mock import MagicMock, patch
-
 import pytest
-from sqlmodel import Session, text
+from sqlmodel import Session
 
 from osintote.models.database import get_session
 from osintote.models.orm import Error, ErrorRead, ErrorSeverity

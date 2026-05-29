@@ -19,9 +19,8 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator
 from contextlib import suppress
-from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -42,7 +41,7 @@ _error_queue: asyncio.Queue[Error] = asyncio.Queue()
 _error_listeners: list[asyncio.Queue[Error]] = []
 
 
-async def _error_stream() -> AsyncGenerator[str, None]:
+async def _error_stream() -> AsyncGenerator[str]:
     """Generator that yields SSE-formatted error records."""
     while True:
         try:
@@ -70,7 +69,7 @@ async def error_stream() -> StreamingResponse:
 
     try:
 
-        async def _gen() -> AsyncGenerator[str, None]:
+        async def _gen() -> AsyncGenerator[str]:
             while True:
                 try:
                     error = await asyncio.wait_for(queue.get(), timeout=15.0)
@@ -117,11 +116,7 @@ async def list_errors(
         query = query.where(Error.severity == severity)
     if task_id:
         query = query.where(Error.task_id == task_id)
-    query = (
-        query.offset(offset)
-        .limit(limit)
-        .order_by(Error.created_at.desc())
-    )
+    query = query.offset(offset).limit(limit).order_by(Error.created_at.desc())
     return list(db.exec(query).all())  # type: ignore[union-attr]
 
 
