@@ -13,8 +13,17 @@ init: ## Bootstrap dev environment with uv sync
 
 dev: ## Run dev servers (Python API + frontend)
 	@echo "Starting OSINTote dev servers..."
-	@uv run uvicorn osintote.__main__:app --reload --host 0.0.0.0 --port 8000 & \
+	@uv run uvicorn osintote.api.app:app --reload --host 0.0.0.0 --port 8000 & \
 		uv -C frontend run dev
+
+dev-both: ## Start backend and frontend in one terminal (cross-platform)
+	@echo "Starting OSINTote (backend + frontend)..."
+	@echo "  Backend  → http://127.0.0.1:8000"
+	@echo "  Frontend → http://localhost:5173"
+	@echo "  API docs → http://127.0.0.1:8000/api/docs"
+	@echo ""
+	@uv run uvicorn osintote.api.app:app --reload --host 0.0.0.0 --port 8000 &
+	@uv -C frontend run dev
 
 fmt: ## Format Python and frontend code
 	@uv run ruff format src/osintote

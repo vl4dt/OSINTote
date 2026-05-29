@@ -66,21 +66,67 @@ This creates:
 
 ## Running OSINTote
 
-### Web Server
+OSINTote consists of **two servers**:
+
+| Server | Port | Description |
+|--------|------|-------------|
+| **Backend (FastAPI)** | `8000` | REST API, SSE streams, Swagger docs at `/api/docs` |
+| **Frontend (Vite/SvelteKit)** | `5173` | Web UI (dark-themed 3-panel dashboard) |
+
+Both must be running simultaneously for full functionality.
+
+### Option 1: Dev Script (Recommended)
 
 ```bash
-osintote serve
+# Start both servers
+./scripts/dev.sh
+
+# Or only one of them
+./scripts/dev.sh api   # Backend only
+./scripts/dev.sh ui    # Frontend only
 ```
 
-The server starts at `http://127.0.0.1:8000` by default. The API is available at `/api/`. Interactive docs: `http://127.0.0.1:8000/api/docs`
-
-### Development Mode
+### Option 2: Makefile
 
 ```bash
+# Start both servers (Unix/macOS)
 make dev
+
+# Or start them in separate terminals
+osintote serve                        # Terminal 1 — backend
+make dev                              # Terminal 2 — frontend (cd frontend && npm run dev)
 ```
 
-Runs both the API server and the SvelteKit frontend with hot-reload enabled.
+> **Note:** `make dev` uses background jobs (`&`) which work on Unix/macOS. On Windows, use the `scripts/dev.sh` script or open two terminals manually.
+
+### Option 3: Manual (Two Terminals)
+
+```bash
+# Terminal 1 — Backend API server
+osintote serve
+
+# Terminal 2 — Frontend dev server
+cd frontend
+npm run dev
+```
+
+### URLs After Starting
+
+| URL | Description |
+|-----|-------------|
+| `http://localhost:5173` | Web UI (frontend dev server) |
+| `http://127.0.0.1:8000` | Backend API server |
+| `http://127.0.0.1:8000/api/docs` | Swagger UI (interactive API docs) |
+
+### Production Build
+
+```bash
+# Build Docker image (multi-stage, multi-arch)
+docker build -t osintote .
+
+# Run with docker-compose
+docker-compose up --build
+```
 
 ### With Docker
 
