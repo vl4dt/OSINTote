@@ -4,15 +4,11 @@
 
 import asyncio
 import json
-import os
-import time
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from osintote.engine.wal import WALEntry, WriteAheadLog
-
 
 # ── WALEntry tests ───────────────────────────────────────────────────────────
 
@@ -163,7 +159,7 @@ class TestWriteAheadLog:
 
         # Verify file exists and has two lines
         assert Path(wal_path).exists()
-        with open(wal_path, "r") as f:
+        with open(wal_path) as f:
             lines = [line.strip() for line in f if line.strip()]
         assert len(lines) == 2
         entry = WALEntry.from_json(lines[0])
@@ -287,9 +283,16 @@ class TestWriteAheadLogRecovery:
     def test_recover_skips_malformed_lines(self, wal_path: str) -> None:
         """Test that recovery skips malformed lines."""
         with open(wal_path, "w") as f:
-            f.write('{"sequence": 1, "timestamp": 100.0, "operation": "insert", "entity": "task", "entity_id": "t1", "data": {}}\n')
+            f.write(
+                '{"sequence": 1, "timestamp": 100.0, "operation": "insert", '
+                '"entity": "task", "entity_id": "t1", "data": {}}\n'
+            )
             f.write("MALFORMED LINE\n")
-            f.write('{"sequence": 2, "timestamp": 200.0, "operation": "update", "entity": "task", "entity_id": "t1", "data": {"status": "running"}}\n')
+            f.write(
+                '{"sequence": 2, "timestamp": 200.0, "operation": "update", '
+                '"entity": "task", "entity_id": "t1", '
+                '"data": {"status": "running"}}\n'
+            )
             f.write("\n")  # empty line
 
         wal = WriteAheadLog(wal_path=wal_path)
@@ -357,7 +360,19 @@ class TestWriteAheadLogRecovery:
         """Test truncating the WAL file."""
         # Write some entries
         with open(wal_path, "w") as f:
-            f.write(json.dumps({"sequence": 1, "timestamp": 100.0, "operation": "insert", "entity": "task", "entity_id": "t1", "data": {}}) + "\n")
+            f.write(
+                json.dumps(
+                    {
+                        "sequence": 1,
+                        "timestamp": 100.0,
+                        "operation": "insert",
+                        "entity": "task",
+                        "entity_id": "t1",
+                        "data": {},
+                    }
+                )
+                + "\n"
+            )
 
         wal = WriteAheadLog(wal_path=wal_path)
         wal.truncate()
@@ -381,14 +396,18 @@ class TestWriteAheadLogIntegration:
     async def test_executor_with_wal(self, wal_path: str) -> None:
         """Test that executor correctly uses WAL for task status writes."""
         from osintote.engine import Executor, FakeStage
-        from osintote.engine.stage import Stage
         from osintote.engine.wal import WriteAheadLog
         from osintote.notify.notifier import Notifier
 
         class DummyNotifier(Notifier):
-            async def on_task_complete(self, task_id: str, target_name: str, extra: dict | None = None) -> None:
+            async def on_task_complete(
+                self, task_id: str, target_name: str, extra: dict | None = None
+            ) -> None:
                 pass
-            async def on_task_fail(self, task_id: str, target_name: str, error_message: str | None = None) -> None:
+
+            async def on_task_fail(
+                self, task_id: str, target_name: str, error_message: str | None = None
+            ) -> None:
                 pass
 
         # Create a real executor with WAL
@@ -412,8 +431,8 @@ class TestWriteAheadLogIntegration:
 
         # Verify WAL was written
         assert Path(wal_path).exists()
-        with open(wal_path, "r") as f:
-            lines = [l.strip() for l in f if l.strip()]
+        with open(wal_path) as f:
+            lines = [line.strip() for line in f if line.strip()]
         assert len(lines) > 0  # At least RUNNING and COMPLETED
 
         # Verify task status transitions were logged
@@ -430,6 +449,6 @@ class TestWriteAheadLogIntegration:
         executor = Executor(max_concurrent=1, wal=None)
         assert executor.wal is None
 
-        stage = FakeStage(success=True)
         # Should not crash when wal is None
+        FakeStage(success=True)
         assert executor.wal is None
