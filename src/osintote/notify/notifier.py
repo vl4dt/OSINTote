@@ -144,9 +144,7 @@ class Notifier:
             import hmac
 
             payload_bytes = json.dumps(payload).encode("utf-8")
-            signature = hmac.new(
-                secret.encode("utf-8"), payload_bytes, hashlib.sha256
-            ).hexdigest()
+            signature = hmac.new(secret.encode("utf-8"), payload_bytes, hashlib.sha256).hexdigest()
             extra_headers["X-Webhook-Signature"] = f"sha256={signature}"
 
         logger.info("Sending webhook to %s", url)

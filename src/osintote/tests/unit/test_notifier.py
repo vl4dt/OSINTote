@@ -170,9 +170,7 @@ class TestOnTaskComplete:
     async def test_on_task_complete_no_callbacks(self):
         """Test on_task_complete with no callbacks."""
         notifier = Notifier()
-        results = await notifier.on_task_complete(
-            str(uuid4()), "example.com"
-        )
+        results = await notifier.on_task_complete(str(uuid4()), "example.com")
         assert results == []
 
     @pytest.mark.asyncio
