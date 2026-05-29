@@ -1,60 +1,18 @@
 <script lang="ts">
-	import welcomeFallback from '$lib/images/svelte-welcome.png';
-	import welcome from '$lib/images/svelte-welcome.webp';
+	import { onMount } from 'svelte';
 
-	import Counter from './Counter.svelte';
+	onMount(() => {
+		window.location.replace('/dashboard');
+	});
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
-
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcomeFallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
-</section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
-
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
+<div class="flex items-center justify-center h-screen bg-[var(--color-bg-0)]">
+	<div class="text-center">
+		<div class="mb-4">
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-[var(--color-text-3)] mx-auto animate-spin" viewBox="0 0 24 24" fill="none">
+				<path d="M12 2v4m0 12v4m-9.17-15.17l2.83 2.83m11.34 11.34l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m11.34-11.34l2.83-2.83" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+			</svg>
+		</div>
+		<p class="text-sm text-[var(--color-text-3)]">Loading OSINTote...</p>
+	</div>
+</div>

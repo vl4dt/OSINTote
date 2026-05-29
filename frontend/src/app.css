@@ -1,0 +1,77 @@
+@import 'tailwindcss';
+@import '@fontsource/fira-mono';
+
+/* OSINTote dark theme */
+@theme {
+	--color-bg-app: #0d1117;
+	--color-bg-panel: #161b22;
+	--color-bg-header: #010409;
+	--color-bg-hover: #1c2128;
+	--color-border: #30363d;
+	--color-border-light: #484f58;
+	--color-text-primary: #e6edf3;
+	--color-text-secondary: #8b949e;
+	--color-text-muted: #6e7681;
+	--color-accent: #58a6ff;
+	--color-success: #3fb950;
+	--color-warning: #d29922;
+	--color-error: #f85149;
+	--color-info: #58a6ff;
+}
+
+/* Reset and base */
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+	background-color: var(--color-bg-app);
+	color: var(--color-text-primary);
+	overflow: hidden;
+	height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+::-webkit-scrollbar-thumb {
+	background: var(--color-border);
+	border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+	background: var(--color-border-light);
+}
+
+/* Monospace font for code/data */
+.font-mono {
+	font-family: 'Fira Mono', monospace;
+}
+
+/* Focus ring */
+*:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+/* Selection */
+::selection {
+	background: var(--color-accent);
+	color: white;
+}
+
+/* Panel resize handle */
+.resize-handle {
+	width: 3px;
+	cursor: col-resize;
+	background: transparent;
+	transition: background 0.15s;
+	flex-shrink: 0;
+}
+.resize-handle:hover,
+.resize-handle.active {
+	background: var(--color-accent);
+}
