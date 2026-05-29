@@ -22,6 +22,7 @@ Usage::
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
+from typing import Any
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -112,3 +113,18 @@ def init_db() -> None:
     sync_url = DATABASE_URL.replace("aiosqlite", "pysqlite")
     sync_engine = sync_create_engine(sync_url)
     SQLModel.metadata.create_all(sync_engine)
+
+
+# ── sync helper for CLI ─────────────────────────────────────────────
+
+
+def get_session() -> Any:
+    """Return a sync SQLite engine for CLI commands.
+
+    CLI commands run in synchronous contexts (typer), so we need a
+    sync engine. This creates one on-demand from the same DB URL.
+    """
+    from sqlalchemy import create_engine as sync_create_engine
+
+    sync_url = DATABASE_URL.replace("aiosqlite", "pysqlite")
+    return sync_create_engine(sync_url, connect_args={"check_same_thread": False})

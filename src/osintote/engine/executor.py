@@ -256,9 +256,7 @@ class Executor:
         """Background worker that pulls items from the priority queue."""
         while self._running:
             try:
-                item: TaskItem = await asyncio.wait_for(
-                    self._task_queue.get(), timeout=1.0
-                )
+                item: TaskItem = await asyncio.wait_for(self._task_queue.get(), timeout=1.0)
             except TimeoutError:
                 continue
 
@@ -288,11 +286,13 @@ class Executor:
         )
 
         # Emit task_started
-        self._emit(ExecutionEvent(
-            task_id=task_id,
-            event_type="task_started",
-            data={"target": item.target_name, "stages": len(item.stages)},
-        ))
+        self._emit(
+            ExecutionEvent(
+                task_id=task_id,
+                event_type="task_started",
+                data={"target": item.target_name, "stages": len(item.stages)},
+            )
+        )
 
         results: list[StageResult] = []
 
@@ -307,11 +307,13 @@ class Executor:
         for stages, cost_event in zip(cost_order, cost_events, strict=True):
             if self.is_cancelled(task_id):
                 ctx.update_status(TaskStatus.CANCELLED.value)
-                self._emit(ExecutionEvent(
-                    task_id=task_id,
-                    event_type="task_finished",
-                    data={"status": "cancelled", "results_count": len(results)},
-                ))
+                self._emit(
+                    ExecutionEvent(
+                        task_id=task_id,
+                        event_type="task_finished",
+                        data={"status": "cancelled", "results_count": len(results)},
+                    )
+                )
                 return results
 
             # Dispatch by cost tier
@@ -320,11 +322,13 @@ class Executor:
                 for stage in stages:
                     if self.is_cancelled(task_id):
                         ctx.update_status(TaskStatus.CANCELLED.value)
-                        self._emit(ExecutionEvent(
-                            task_id=task_id,
-                            event_type="task_finished",
-                            data={"status": "cancelled", "results_count": len(results)},
-                        ))
+                        self._emit(
+                            ExecutionEvent(
+                                task_id=task_id,
+                                event_type="task_finished",
+                                data={"status": "cancelled", "results_count": len(results)},
+                            )
+                        )
                         return results
 
                     assert self._semaphore is not None
@@ -333,9 +337,7 @@ class Executor:
                         result = await self._run_stage(ctx, stage)
                         results.append(result)
                         ctx.findings[stage.name] = result.to_dict()
-                        ctx.records.extend(
-                            result.data if isinstance(result.data, list) else []
-                        )
+                        ctx.records.extend(result.data if isinstance(result.data, list) else [])
                     finally:
                         self._semaphore.release()
             else:
@@ -343,36 +345,44 @@ class Executor:
                 for stage in stages:
                     if self.is_cancelled(task_id):
                         ctx.update_status(TaskStatus.CANCELLED.value)
-                        self._emit(ExecutionEvent(
-                            task_id=task_id,
-                            event_type="task_finished",
-                            data={"status": "cancelled", "results_count": len(results)},
-                        ))
+                        self._emit(
+                            ExecutionEvent(
+                                task_id=task_id,
+                                event_type="task_finished",
+                                data={"status": "cancelled", "results_count": len(results)},
+                            )
+                        )
                         return results
 
                     result = await self._run_stage(ctx, stage)
                     results.append(result)
                     ctx.findings[stage.name] = result.to_dict()
-                    ctx.records.extend(
-                        result.data if isinstance(result.data, list) else []
-                    )
+                    ctx.records.extend(result.data if isinstance(result.data, list) else [])
 
         # Determine final status
         failed = [r for r in results if not r.success]
         if failed:
             ctx.update_status(TaskStatus.FAILED.value)
-            self._emit(ExecutionEvent(
-                task_id=task_id,
-                event_type="task_finished",
-                data={"status": "failed", "failures": len(failed), "results_count": len(results)},
-            ))
+            self._emit(
+                ExecutionEvent(
+                    task_id=task_id,
+                    event_type="task_finished",
+                    data={
+                        "status": "failed",
+                        "failures": len(failed),
+                        "results_count": len(results),
+                    },
+                )
+            )
         else:
             ctx.update_status(TaskStatus.COMPLETED.value)
-            self._emit(ExecutionEvent(
-                task_id=task_id,
-                event_type="task_finished",
-                data={"status": "completed", "results_count": len(results)},
-            ))
+            self._emit(
+                ExecutionEvent(
+                    task_id=task_id,
+                    event_type="task_finished",
+                    data={"status": "completed", "results_count": len(results)},
+                )
+            )
 
         # Notify
         if self.notifier:
@@ -395,11 +405,13 @@ class Executor:
         stage: Stage,
     ) -> StageResult:
         """Run a single stage with error handling."""
-        self._emit(ExecutionEvent(
-            task_id=ctx.task_id,
-            event_type="stage_started",
-            stage_name=stage.name,
-        ))
+        self._emit(
+            ExecutionEvent(
+                task_id=ctx.task_id,
+                event_type="stage_started",
+                stage_name=stage.name,
+            )
+        )
 
         start = ctx.elapsed_ms
 
@@ -421,12 +433,14 @@ class Executor:
 
         result.elapsed_ms = ctx.elapsed_ms - start
 
-        self._emit(ExecutionEvent(
-            task_id=ctx.task_id,
-            event_type="stage_complete",
-            stage_name=stage.name,
-            data=result.to_dict(),
-        ))
+        self._emit(
+            ExecutionEvent(
+                task_id=ctx.task_id,
+                event_type="stage_complete",
+                stage_name=stage.name,
+                data=result.to_dict(),
+            )
+        )
 
         if not result.success:
             logger.warning(

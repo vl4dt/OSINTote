@@ -10,12 +10,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from osintote.__about__ import __version__
-from osintote.api.routes import logs
+from osintote.api.routes import logs, tasks
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI) -> AsyncIterator[None]:  # type: ignore[return-type]
-    """Application lifespan — run migrations at startup."""
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    """Application lifespan — run migrations, init executor at startup."""
+    """Application lifespan — run migrations, init executor at startup."""
     # Run Alembic migrations on startup
     try:
         from osintote.models.database import auto_migrate
@@ -23,7 +24,19 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:  # type: ignore[return
         await auto_migrate()
     except Exception:
         pass
+
+    # Initialise executor
+    from osintote.engine.executor import Executor
+    from osintote.notify.notifier import Notifier
+
+    executor = Executor(max_concurrent=4, cpu_workers=2)
+    notifier = Notifier()
+    executor.notifier = notifier
+    await executor.start()
+    tasks.set_executor(executor)
+    _app.state.executor = executor
     yield
+    await executor.stop()
 
 
 app = FastAPI(
@@ -52,3 +65,4 @@ async def health_check() -> dict[str, str]:
 
 
 app.include_router(logs.router)
+app.include_router(tasks.router)

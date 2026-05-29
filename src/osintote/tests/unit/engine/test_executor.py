@@ -5,13 +5,11 @@
 from __future__ import annotations
 
 import asyncio
-from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from osintote.engine.executor import ExecutionEvent, Executor
-from osintote.engine.stage import FakeStage, Stage, StageContext, StageResult
-
+from osintote.engine.stage import FakeStage, StageResult
 
 # ── ExecutionEvent ──────────────────────────────────────────────────────────
 
@@ -142,6 +140,7 @@ class TestExecutorExecution:
         executor._semaphore = asyncio.Semaphore(4)  # Set up semaphore manually
 
         from osintote.engine.executor import TaskItem
+
         item = TaskItem(
             task_id="t1",
             target_name="test.com",
@@ -277,6 +276,7 @@ class TestExecutorIntegration:
         executor._semaphore = asyncio.Semaphore(4)
 
         from osintote.engine.executor import TaskItem
+
         item = TaskItem(
             task_id="t1",
             target_name="test.com",
@@ -303,6 +303,7 @@ class TestExecutorIntegration:
         executor._semaphore = asyncio.Semaphore(4)
 
         from osintote.engine.executor import TaskItem
+
         item = TaskItem(
             task_id="t1",
             target_name="test.com",

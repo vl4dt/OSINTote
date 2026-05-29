@@ -11,6 +11,7 @@ from typer import Option, Typer
 
 from osintote.__about__ import __version__
 from osintote.cli.commands import settings as settings_app
+from osintote.cli.commands import tasks as tasks_app
 
 app = Typer(
     name="osintote",
@@ -245,6 +246,7 @@ def status() -> None:
 
 
 app.add_typer(settings_app._app, name="settings")
+app.add_typer(tasks_app.app, name="tasks")
 
 
 def main() -> None:
