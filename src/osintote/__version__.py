@@ -5,6 +5,6 @@
 
 from __future__ import annotations
 
-from osintote.__about__ import __version__  # noqa: F401
+from osintote.__about__ import __version__
 
 __all__: list[str] = ["__version__"]

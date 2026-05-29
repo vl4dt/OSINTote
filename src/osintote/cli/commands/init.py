@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 """Init command — bootstrap the OSINTote project."""
 
+import json
 import sys
 from pathlib import Path
 
@@ -15,16 +16,20 @@ _app = Typer()
 def init(
     force: bool = False,
     db_path: str = "osintote.db",
+    on_complete: str | None = None,
 ) -> None:
     """Initialize OSINTote project."""
     import typer
 
     force = typer.Option(force, "--force", help="Overwrite existing files")
     db_path = typer.Option(db_path, "--db-path", "-d", help="Path to the SQLite database file")
-    _init_project(db_path, force)
+    on_complete = typer.Option(
+        on_complete, "--on-complete", help="Shell command to run on task completion"
+    )
+    _init_project(db_path, force, on_complete)
 
 
-def _init_project(db_path: str, force: bool) -> None:
+def _init_project(db_path: str, force: bool, on_complete: str | None = None) -> None:
     """Bootstrap the OSINTote project."""
     from rich.console import Console
     from rich.panel import Panel
@@ -100,6 +105,17 @@ def _init_project(db_path: str, force: bool) -> None:
     except Exception as e:
         console.print(f"[red]✗[/] Database error: {e}")
         sys.exit(1)
+
+    # Save callback config if --on-complete was provided
+    if on_complete:
+        from osintote.notify import Notifier
+
+        notifier = Notifier()
+        notifier.add_command(on_complete)
+        callback_file = config_dir / "callbacks.json"
+        callback_data = {"callbacks": [{"command": on_complete, "enabled": True}]}
+        callback_file.write_text(json.dumps(callback_data, indent=2))
+        console.print(f"[green]✓[/] Callback configured: [dim]{callback_file}[/]")
 
     # Summary
     console.print(
