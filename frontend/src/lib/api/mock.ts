@@ -4,7 +4,7 @@
  * Swap for real API endpoints when backend is ready.
  */
 
-import type { Target, Task, TaskStatus, Result, SSEEvent } from '$lib/types';
+import type { ApiKey, Target, Task, TaskStatus, Result, SSEEvent } from '$lib/types';
 
 // --- Seed Data ---
 
@@ -187,6 +187,55 @@ export const mockTasks: Task[] = [
 	}
 ];
 
+// --- API Keys ---
+
+export const mockApiKeys: ApiKey[] = [
+	{
+		id: 'key-001',
+		name: 'Shodan Primary',
+		source: 'shodan',
+		key: 'shodan-key-abc123',
+		primary: true,
+		fallback: false,
+		status: 'active',
+		createdAt: '2026-05-20 10:00:00',
+		updatedAt: '2026-05-28 14:00:00',
+	},
+	{
+		id: 'key-002',
+		name: 'VirusTotal Primary',
+		source: 'virustotal',
+		key: 'vt-key-def456',
+		primary: true,
+		fallback: false,
+		status: 'active',
+		createdAt: '2026-05-22 08:30:00',
+		updatedAt: '2026-05-28 12:15:00',
+	},
+	{
+		id: 'key-003',
+		name: 'Shodan Fallback',
+		source: 'shodan',
+		key: 'shodan-key-ghi789',
+		primary: false,
+		fallback: true,
+		status: 'active',
+		createdAt: '2026-05-23 09:00:00',
+		updatedAt: '2026-05-27 09:45:00',
+	},
+	{
+		id: 'key-004',
+		name: 'OpenAI API',
+		source: 'openai',
+		key: 'sk-openai-xyz',
+		primary: true,
+		fallback: false,
+		status: 'rate-limited',
+		createdAt: '2026-05-25 11:00:00',
+		updatedAt: '2026-05-28 15:00:00',
+	},
+];
+
 export const mockResults: Result[] = [
 	{
 		id: 'res-001',
@@ -364,6 +413,14 @@ export interface APIService {
 	getResultsByTask(taskId: string): Promise<Result[]>;
 	getResult(id: string): Promise<Result | null>;
 
+	// API Keys
+	getApiKeys(): Promise<ApiKey[]>;
+	getApiKey(id: string): Promise<ApiKey | null>;
+	createApiKey(apiKey: Omit<ApiKey, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<ApiKey>;
+	updateApiKey(id: string, updates: Partial<ApiKey>): Promise<ApiKey>;
+	deleteApiKey(id: string): Promise<void>;
+	rotateApiKey(id: string, newKey: string): Promise<ApiKey>;
+
 	subscribeSSE(callback: (event: SSEEvent) => void): () => void;
 }
 
@@ -463,6 +520,52 @@ export const mockAPIService: APIService = {
 
 	async getResult(id): Promise<Result | null> {
 		return Promise.resolve(mockResults.find(r => r.id === id) ?? null);
+	},
+
+	// API Keys
+	async getApiKeys(): Promise<ApiKey[]> {
+		return Promise.resolve([...mockApiKeys]);
+	},
+
+	async getApiKey(id: string): Promise<ApiKey | null> {
+		return Promise.resolve(mockApiKeys.find(k => k.id === id) ?? null);
+	},
+
+	async createApiKey(data): Promise<ApiKey> {
+		const newKey: ApiKey = {
+			...data,
+			id: `key-${Date.now()}`,
+			createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+			updatedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+			status: 'active',
+		};
+		mockApiKeys.push(newKey);
+		return Promise.resolve(newKey);
+	},
+
+	async updateApiKey(id, updates): Promise<ApiKey> {
+		const idx = mockApiKeys.findIndex(k => k.id === id);
+		if (idx === -1) return Promise.resolve(null as any);
+		Object.assign(mockApiKeys[idx], updates, { updatedAt: new Date().toISOString().replace('T', ' ').slice(0, 19) });
+		return Promise.resolve(mockApiKeys[idx]);
+	},
+
+	async deleteApiKey(id): Promise<void> {
+		const idx = mockApiKeys.findIndex(k => k.id === id);
+		if (idx !== -1) mockApiKeys.splice(idx, 1);
+		return Promise.resolve();
+	},
+
+	async rotateApiKey(id, newKey): Promise<ApiKey> {
+		const idx = mockApiKeys.findIndex(k => k.id === id);
+		if (idx === -1) return Promise.resolve(null as any);
+		mockApiKeys[idx] = {
+			...mockApiKeys[idx],
+			key: newKey,
+			primary: true,
+			updatedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+		};
+		return Promise.resolve(mockApiKeys[idx]);
 	},
 
 	subscribeSSE(callback: (event: SSEEvent) => void): () => void {

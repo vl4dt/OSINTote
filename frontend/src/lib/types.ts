@@ -83,3 +83,19 @@ export interface LogEntry {
 	message: string;
 	pid?: number;
 }
+
+// --- API Keys ---
+
+export type ApiKeyStatus = 'active' | 'rate-limited' | 'failed' | 'unknown';
+
+export interface ApiKey {
+	id: string;
+	name: string;
+	source: string;
+	key: string;
+	primary: boolean;
+	fallback: boolean;
+	status: ApiKeyStatus;
+	createdAt: string;
+	updatedAt: string;
+}

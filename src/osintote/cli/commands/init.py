@@ -12,6 +12,16 @@ from typer import Typer
 _app = Typer()
 
 
+def get_session():
+    """Return a sync SQLite engine for CLI commands.
+
+    Re-exports from osintote.models.database for CLI convenience.
+    """
+    from osintote.models.database import get_session as _get_session
+
+    return _get_session()
+
+
 @_app.command()
 def init(
     force: bool = False,
