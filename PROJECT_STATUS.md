@@ -5,16 +5,16 @@
 ## Summary
 
 ```
-OVERALL  [++++++++++++++++++++++++++++++++++++------------------------------]  34/57 (60%) | 23 remaining | 0 blocked
+OVERALL  [+++++++++++++++++++++++++++++++++++++++++++++++++-------------]  35/57 (61%) | 22 remaining | 0 blocked
 ```
 
 | Epic | Status | Done/Total | % |
 |------|--------|-----------|---|
 | **Foundation (enz)** | COMPLETE | 8/8 | 100% |
 | **Pipeline & Engine (yk2)** | COMPLETE | 12/12 | 100% |
-| **Polish & Ship (35e)** | IN PROGRESS | 11/12 | 92% |
+| **Polish & Ship (35e)** | IN PROGRESS | 12/13 | 92% |
 | **Data Sources (jcz)** | IN PROGRESS | 1/12 | 8% |
-| **Intelligence & AI (2yq)** | IN PROGRESS | 1/8 | 12% |
+| **Intelligence & AI (2yq)** | IN PROGRESS | 1/9 | 11% |
 
 ---
 
@@ -64,7 +64,7 @@ OVERALL  [++++++++++++++++++++++++++++++++++++------------------------------]  3
 | ✓ | OSINTote-35e.3 | Keys management UI — /settings page → keys tab, add/edit/delete API keys, status indicators (active/rate-limited/failed), encrypted masking |
 | ✓ | OSINTote-35e.4 | Settings management UI — /settings page, AI config editor (provider, models per role), default recipe selector, output format picker (JSON/Markdown/HTML), theme toggle |
 | ✓ | OSINTote-35e.5 | Documentation — README, getting-started, cli-reference, web-ui-guide, security, faq, api-reference, recipes, 5 ADRs |
-| **○** | OSINTote-35e.6 | Final integration & demo — end-to-end test: target → DNS → HTTP → results → report, full CLI + web UI flow, screenshot documentation, release checklist, CHANGELOG.md v0.1.0 |
+| ✓ | OSINTote-35e.6 | Final integration & demo — comprehensive E2E test (target → DNS → HTTP → results → report, WAL verification, report generation, API routes), reporter.py db fix, CHANGELOG.md v0.1.0 |
 | ✓ | OSINTote-35e.7 | Callback system — Notifier.run_command(), CLI --on-complete flag, safe shell execution (shlex + subprocess_exec), HMAC-SHA256 webhook signing |
 | ✓ | OSINTote-35e.8 | Docker multi-stage build — Stage 1: Node frontend build, Stage 2: Python FastAPI (uvicorn + gunicorn) |
 | ✓ | OSINTote-35e.9 | Testing infrastructure — unit tests (engine logic, models, crypto, router, CLI, database, API), integration tests (route registration, health endpoint, DB setup) |
@@ -119,7 +119,7 @@ OVERALL  [++++++++++++++++++++++++++++++++++++------------------------------]  3
 
 ## Recommended Next Steps
 
-1. **35e.6** (Final Integration) — **all dependencies now unblocked!** Pipeline & Engine epic complete. Demo the full pipeline.
+1. **35e.6** (Final Integration) — ✓ COMPLETE. E2E test, CHANGELOG v0.1.0, reporter fix.
 2. **jcz.5** (CLI wrapper framework) — unblocks jcz.1, jcz.2, jcz.6, jcz.7
 3. **jcz.9** (Target normalization) — unblocks jcz.1, jcz.3, 2yq.4
 4. **jcz.1** (DNS enumeration) — first concrete data source
@@ -127,7 +127,7 @@ OVERALL  [++++++++++++++++++++++++++++++++++++------------------------------]  3
 
 ## Test Status
 
-- **332 tests passing**, 2 skipped, 2 warnings
+- **335 tests passing**, 2 skipped, 2 warnings
 - Coverage across: engine (executor, stage, wal), CLI, API, crypto, logging, database, ORM, notifier, platform_notifiers, SSE streaming, HTTP probe, error handling, recipes, reports, recon display
 
 ## Code Quality
