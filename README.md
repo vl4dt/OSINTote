@@ -58,9 +58,13 @@ make dev
 | **Tasks** | Run multi-stage reconnaissance pipelines against targets |
 | **Results** | View collected records with severity ratings and source tracking |
 | **Dashboard** | Real-time overview of active tasks, targets, and findings |
-| **Recipes** | Pre-built and custom pipeline definitions for common OSINT workflows |
+| **Recipes** | Pre-built and custom pipeline definitions (quick-scan, full-scan, passive-only) |
 | **Webhooks** | Configure callbacks to receive notifications on task events |
-| **AI Analysis** | Intelligent target classification, anomaly detection, and report generation |
+| **AI Analysis** | Pluggable AI providers (OpenAI, Ollama, LMStudio, vLLM) with query engine, suggestions, and analysis |
+| **Context Pruning** | Auto-summarize and prune context for token-efficient AI processing |
+| **Relationship Graph** | vis.js-based interactive network graph of targets, hosts, and services |
+| **Rate Limiter** | Per-source async semaphore with adaptive backoff on HTTP 429 |
+| **Report Generation** | Export to JSON, Markdown, or standalone HTML (with vis.js network graphs) |
 
 ## CLI Reference
 
@@ -73,7 +77,12 @@ See [docs/cli-reference.md](./docs/cli-reference.md) for the complete CLI comman
 | `osintote init` | Initialize a new OSINTote project |
 | `osintote serve` | Start the web API server |
 | `osintote status` | Check system status |
-| `osintote --help` | Show help and available commands |
+| `osintote api-key` | Manage API keys for external sources |
+| `osintote recon` | Run reconnaissance pipelines |
+| `osintote tasks` | Manage task lifecycle |
+| `osintote recipes` | Manage reconnaissance recipes |
+| `osintote settings` | Manage project settings |
+| `osintote webhook` | Manage webhook subscriptions |
 
 ## Web UI Guide
 
@@ -83,8 +92,10 @@ See [docs/web-ui-guide.md](./docs/web-ui-guide.md) for a complete guide to using
 
 - **Dashboard** — Overview of active tasks, target counts, and recent findings
 - **Targets** — Add, search, and manage intelligence targets
-- **Tasks** — Run and monitor reconnaissance tasks with live progress
+- **Tasks** — Run and monitor reconnaissance tasks with live SSE progress
 - **Results** — View collected data, filter by severity, and examine details
+- **Logs** — Real-time log streaming via Server-Sent Events with filtering and export
+- **Settings** — AI configuration, default recipe, output format, and API key management
 
 ## API Reference
 
@@ -116,25 +127,52 @@ See [docs/security.md](./docs/security.md) for security considerations, threat m
 ```
 OSINTote/
 ├── src/osintote/           # Python package
+│   ├── ai/                 # AI providers, query engine, suggester, analysis
 │   ├── api/                # FastAPI application + routers
 │   ├── cli/                # CLI commands (Typer)
 │   ├── engine/             # Pipeline engine & recipe system
 │   ├── models/             # SQLAlchemy/SQLModel ORM models
 │   ├── notify/             # Callback system (webhooks, shell commands)
-│   ├── reports/            # Report generation
-│   ├── sources/            # Data source implementations
+│   ├── recipes/            # Recipe definitions and loader
+│   ├── reports/            # Report generation (JSON, Markdown, HTML)
+│   ├── workers/            # Data source stages (DNS, HTTP, nmap, nuclei, etc.)
 │   ├── crypto.py           # AES-256-GCM encryption utilities
 │   ├── logging_config.py   # Structured JSON/SSE logging
 │   └── __about__.py        # Package metadata
-├── frontend/               # SvelteKit Web UI
+├── frontend/               # SvelteKit Web UI (Svelte 5, Tailwind CSS 4)
 │   ├── src/lib/            # Shared components + API client
 │   ├── src/routes/         # Page routes
 │   └── static/             # Static assets
-├── docs/                   # Documentation
+├── docs/                   # Documentation + ADRs
+│   └── adr/                # Architecture Decision Records
 ├── .beads/                 # Beads issue tracking database
 ├── pyproject.toml          # Project configuration (hatch + uv)
 ├── Makefile                # Development shortcuts
+├── Dockerfile              # Multi-stage Docker build
+├── docker-compose.yml      # Local development compose
 └── uv.lock                 # Dependency lock file
+```
+
+## Packaging & Deployment
+
+OSINTote is packaged for PyPI using hatch:
+
+```bash
+# Build sdist + wheel
+make build
+
+# Upload to PyPI (requires twine)
+twine upload dist/*
+```
+
+Docker multi-stage build publishes to ghcr.io:
+
+```bash
+# Build for local use
+docker build -t osintote .
+
+# Multi-arch build (CI automated)
+docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/vl4dt/osintote:latest --push .
 ```
 
 ## Development
@@ -149,13 +187,33 @@ make test-cov
 # Format code
 make fmt
 
-# Lint + type check
+# Lint + type check (ruff + mypy)
 make check
 
 # Build the package
 make build
 ```
 
+### Pre-commit Hooks
+
+The project uses pre-commit hooks for quality enforcement:
+
+- **ruff** — Linting and formatting
+- **mypy** — Static type checking
+- **Trim trailing whitespace** — Whitespace cleanup
+- **End of file** — Ensure trailing newline
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Project Status
+
+| Epic | Tasks | Completion |
+|------|-------|------------|
+| Foundation (enz) | 8 | 100% |
+| Pipeline & Engine (yk2) | 12 | 100% |
+| Data Sources (jcz) | 12 | 100% |
+| Polish & Ship (35e) | 12 | 100% |
+| Intelligence & AI (2yq) | 8 | 100% |
+| **Total** | **52** | **100%** |

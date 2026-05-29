@@ -43,7 +43,6 @@ osintote init
 
 This creates:
 - `.osintote/config.json` — Project configuration (database path, listen address, port)
-- `.osintote/callbacks.json` — Callback configuration (if `--on-complete` is specified)
 - `osintote.db` — SQLite database
 - Alembic migration directory — Automatic schema migrations
 
@@ -73,7 +72,7 @@ This creates:
 osintote serve
 ```
 
-The server starts at `http://127.0.0.1:8000` by default. The API is available at `/api/v1/`.
+The server starts at `http://127.0.0.1:8000` by default. The API is available at `/api/`. Interactive docs: `http://127.0.0.1:8000/api/docs`
 
 ### Development Mode
 
