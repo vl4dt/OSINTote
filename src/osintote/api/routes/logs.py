@@ -9,6 +9,7 @@ import asyncio
 import json
 import logging
 from collections import deque
+from contextlib import suppress
 from typing import Any
 
 from fastapi import APIRouter, Query
@@ -38,10 +39,8 @@ class SSELogHandler(logging.Handler):
             "message": record.getMessage(),
             "pid": record.pid,
         }
-        try:
+        with suppress(json.JSONDecodeError, ValueError):
             json.loads(log_entry["timestamp"])
-        except (json.JSONDecodeError, ValueError):
-            pass
 
         loop = asyncio.get_event_loop()
         loop.call_soon_threadsafe(_enqueue_log, log_entry)
@@ -51,10 +50,8 @@ def _enqueue_log(entry: dict[str, Any]) -> None:
     """Thread-safe enqueue of log entry."""
     _log_buffer.append(entry)
     for queue in _listeners:
-        try:
+        with suppress(asyncio.QueueFull):
             queue.put_nowait(entry)
-        except asyncio.QueueFull:
-            pass
 
 
 async def _log_stream(
@@ -80,7 +77,7 @@ async def _log_stream(
                 entry = await asyncio.wait_for(queue.get(), timeout=30.0)
                 if _matches(entry, task_id, logger_name, level):
                     yield f"data: {json.dumps(entry)}\n\n"
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 yield ":\nping\n\n"
     finally:
         _listeners.remove(queue)
@@ -93,13 +90,11 @@ def _matches(
     level: str | None,
 ) -> bool:
     """Check if a log entry matches the filter criteria."""
-    if task_id and task_id.lower() not in entry.get("message", "").lower():
-        return False
-    if logger_name and logger_name.lower() not in entry.get("logger", "").lower():
-        return False
-    if level and entry.get("level") != level:
-        return False
-    return True
+    return not (
+        (task_id and task_id.lower() not in entry.get("message", "").lower())
+        or (logger_name and logger_name.lower() not in entry.get("logger", "").lower())
+        or (level and entry.get("level") != level)
+    )
 
 
 @router.get("/stream")

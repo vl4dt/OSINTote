@@ -7,7 +7,7 @@
 	import type { LogEntry } from '$lib/types';
 	import { onMount, onDestroy } from 'svelte';
 
-	export let collapsible: boolean = false;
+	const { collapsible = false } = $props();
 	let collapsed: boolean = $state(false);
 
 	let logs: LogEntry[] = $state([]);

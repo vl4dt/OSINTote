@@ -22,3 +22,4 @@
 {"id":"int-5775e90a","kind":"field_change","created_at":"2026-05-29T01:57:58.7515095Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-35e.5","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-324f37db","kind":"field_change","created_at":"2026-05-29T02:09:37.5686522Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-35e.8","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
 {"id":"int-c6bd5ccd","kind":"field_change","created_at":"2026-05-29T02:13:21.4389253Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-35e.2","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}
+{"id":"int-d6a35977","kind":"field_change","created_at":"2026-05-29T02:15:38.0851418Z","actor":"Ricardo A. Salgado","issue_id":"OSINTote-35e.1","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Closed"}}

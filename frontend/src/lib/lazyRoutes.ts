@@ -11,6 +11,7 @@ const routeImports: Record<string, () => Promise<RouteModule>> = {
 	tasks: () => import('../routes/tasks/+page.svelte') as Promise<RouteModule>,
 	results: () => import('../routes/results/+page.svelte') as Promise<RouteModule>,
 	logs: () => import('../routes/logs/+page.svelte') as Promise<RouteModule>,
+	settings: () => import('../routes/settings/+page.svelte') as Promise<RouteModule>,
 };
 
 /**

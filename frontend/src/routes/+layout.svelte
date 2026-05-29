@@ -16,7 +16,8 @@
 		{ id: 'targets', label: 'Targets', href: '/targets' },
 		{ id: 'tasks', label: 'Tasks', href: '/tasks' },
 		{ id: 'results', label: 'Results', href: '/results' },
-		{ id: 'logs', label: 'Logs', href: '/logs' }
+		{ id: 'logs', label: 'Logs', href: '/logs' },
+		{ id: 'settings', label: 'Settings', href: '/settings' }
 	];
 
 	// Update clock (browser only)
@@ -55,7 +56,7 @@
 			</a>
 
 			<!-- Separator -->
-			<span class="h-4 w-px bg-[var(--color-border)]" />
+			<span class="h-4 w-px bg-[var(--color-border)]"></span>
 
 			<!-- Status indicator -->
 			<span class="flex items-center gap-1.5 text-xs text-[var(--color-text-secondary)]">
