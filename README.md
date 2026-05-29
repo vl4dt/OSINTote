@@ -58,6 +58,12 @@ osintote init
 .\scripts\dev.ps1
 ```
 
+**Windows (CMD):**
+
+```cmd
+scripts\dev.cmd
+```
+
 **Or use make (Unix/macOS only):**
 
 ```bash

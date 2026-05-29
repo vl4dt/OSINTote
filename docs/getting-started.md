@@ -99,6 +99,14 @@ Both must be running simultaneously for full functionality.
 .\scripts\dev.ps1 ui    # Frontend only
 ```
 
+**Windows (CMD):**
+
+```cmd
+scripts\dev.cmd
+scripts\dev.cmd api
+scripts\dev.cmd ui
+```
+
 ### Option 2: Makefile (Unix/macOS only)
 
 ```bash
