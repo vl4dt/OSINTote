@@ -25,7 +25,7 @@ from typing import Any
 
 import httpx
 
-from osintote.engine.stage import STAGE_REGISTRY, Stage, StageContext, StageResult, register_stage
+from osintote.engine.stage import Stage, StageContext, StageResult, register_stage
 
 logger = logging.getLogger(__name__)
 
