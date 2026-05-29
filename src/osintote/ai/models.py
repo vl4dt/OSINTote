@@ -16,7 +16,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
-class ChatMessageRole(str, Enum):
+class ChatMessageRole(str, Enum):  # noqa: UP042
     """Chat message role (OpenAI API compatible)."""
 
     SYSTEM = "system"
@@ -57,7 +57,7 @@ class ModelInfo(BaseModel):
     owned_by: str = ""
 
 
-class AIProviderType(str, Enum):
+class AIProviderType(str, Enum):  # noqa: UP042
     """Supported AI provider types."""
 
     OPENAI = "openai"

@@ -26,7 +26,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from sqlmodel import Session, select
+from sqlmodel import select
 
 from ..models.orm import Record, Task
 from .provider import AIProviderRegistry
@@ -107,7 +107,7 @@ class DSLParser:
         SELECT name FROM targets
     """
 
-    TABLES = {"records", "tasks", "targets"}
+    TABLES = {"records", "tasks", "targets"}  # noqa: RUF012
 
     @classmethod
     def parse(cls, dsl: str) -> DSLQuery:
@@ -192,7 +192,7 @@ class DSLParser:
                 continue
 
             # Parse condition: column operator value
-            cond = re.match(r"(\w+)\s*(=|!=|<>|>=|<=|>|<|LIKE|NOT\s+LIKE)\s*(.+)", part, re.IGNORECASE)
+            cond = re.match(r"(\w+)\s*(=|!=|<>|>=|<=|>|<|LIKE|NOT\s+LIKE)\s*(.+)", part, re.IGNORECASE)  # noqa: E501
             if cond:
                 current_filter = {
                     "column": cond.group(1).lower(),
@@ -272,9 +272,7 @@ class DSLExecutor:
                 if hasattr(model, field_name):
                     if operator in ("=", "LIKE"):
                         stmt = stmt.where(getattr(model, field_name) == value)
-                    elif operator == "!=":
-                        stmt = stmt.where(getattr(model, field_name) != value)
-                    elif operator == "NOT LIKE":
+                    elif operator == "!=" or operator == "NOT LIKE":
                         stmt = stmt.where(getattr(model, field_name) != value)
                     elif operator == ">=":
                         stmt = stmt.where(getattr(model, field_name) >= value)
@@ -351,9 +349,9 @@ class IntentExtractor:
             "tasks (columns: id, name, status, type, target_id, recordsCount, createdAt), "
             "targets (columns: id, name, type, status, tags, createdAt).\n\n"
             "Return ONLY the DSL query as a plain string, no explanation.\n"
-            "DSL syntax: SELECT <cols> FROM <table> WHERE <condition> ORDER BY <col> [ASC|DESC] LIMIT <n>\n\n"
+            "DSL syntax: SELECT <cols> FROM <table> WHERE <condition> ORDER BY <col> [ASC|DESC] LIMIT <n>\n\n"  # noqa: E501
             "Examples:\n"
-            "  'Show critical vulnerabilities' → SELECT * FROM records WHERE severity='critical' ORDER BY severity DESC\n"
+            "  'Show critical vulnerabilities' → SELECT * FROM records WHERE severity='critical' ORDER BY severity DESC\n"  # noqa: E501
             "  'Count running tasks' → SELECT count(*) FROM tasks WHERE status='running'\n"
             "  'List targets with admin' → SELECT name FROM targets WHERE tags LIKE 'admin'\n"
         )

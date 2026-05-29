@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 """Unit tests for AI workflow suggester."""
 
-import pytest
 
 from osintote.ai.suggester import FindingSuggestion, Suggester
 
@@ -40,7 +39,7 @@ class TestSuggester:
     def test_detect_critical_with_high(self) -> None:
         suggester = Suggester()
         records = [
-            {"type": "http-response", "data": {"severity": "high", "message": "phpMyAdmin admin panel detected"}},
+            {"type": "http-response", "data": {"severity": "high", "message": "phpMyAdmin admin panel detected"}},  # noqa: E501
         ]
         result = suggester.detect_critical(records)
         assert len(result) > 0
@@ -48,7 +47,7 @@ class TestSuggester:
     def test_detect_critical_with_critical(self) -> None:
         suggester = Suggester()
         records = [
-            {"type": "port-open", "data": {"severity": "critical", "message": "MySQL on port 3306"}},
+            {"type": "port-open", "data": {"severity": "critical", "message": "MySQL on port 3306"}},  # noqa: E501
         ]
         result = suggester.detect_critical(records)
         assert len(result) > 0

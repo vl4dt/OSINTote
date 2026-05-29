@@ -24,17 +24,15 @@ from __future__ import annotations
 
 import logging
 import uuid as uuid_module
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlmodel import Session
 
-from ..engine.config import AIClientConfig
 from ..engine.context_pruning import ContextPruner
-from ..models.orm import ErrorSeverity, TaskStatus
-from .models import AISummary, AIAnalysisResult
-from .provider import AIProviderRegistry, AIClientConfig as ClientConfig
+from .models import AISummary
+from .provider import AIProviderRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +133,7 @@ class PromptBuilder:
             "",
             f"Context summary: {context_summary}",
             "",
-            f"Statistics:",
+            "Statistics:",
             f"  Total records: {stats.get('total_records', 0)}",
             f"  Unique targets: {stats.get('unique_targets', 0)}",
             f"  Types: {stats.get('types', {})}",
@@ -226,7 +224,7 @@ class AnalysisEngine:
             return AnalysisResult(
                 summary=AISummary(summary="AI analysis disabled"),
                 task_id=task_id,
-                created_at=datetime.now(timezone.utc).isoformat(),
+                created_at=datetime.now(UTC).isoformat(),
             )
 
         # Step 1: Prune context
@@ -252,7 +250,7 @@ class AnalysisEngine:
             raw=str(result),
             model_used=self.registry.config.model if self.registry.config else "",
             task_id=task_id,
-            created_at=datetime.now(timezone.utc).isoformat(),
+            created_at=datetime.now(UTC).isoformat(),
         )
 
     async def analyze_task(
@@ -274,7 +272,9 @@ class AnalysisEngine:
         AnalysisResult
             Structured analysis result.
         """
-        from ..models.orm import Record
+        from sqlmodel import select
+
+        from ..models.orm import Record, Task
 
         uid = uuid_module.UUID(task_id)
         task = session.get(Task, uid)
@@ -282,7 +282,7 @@ class AnalysisEngine:
             return AnalysisResult(
                 summary=AISummary(summary=f"Task {task_id} not found"),
                 task_id=task_id,
-                created_at=datetime.now(timezone.utc).isoformat(),
+                created_at=datetime.now(UTC).isoformat(),
             )
 
         stmt = select(Record).where(Record.task_id == uid)

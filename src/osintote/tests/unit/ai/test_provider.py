@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: MIT
 """Unit tests for AI provider abstraction."""
 
-import json
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -17,9 +15,9 @@ from osintote.ai.provider import (
     AIProviderRegistry,
     LlamaCPPProvider,
     LMStudioProvider,
+    OllamaProvider,
     OpenAICompatibleHTTP,
     OpenAIProvider,
-    OllamaProvider,
     VLLMProvider,
 )
 from osintote.engine.config import AIClientConfig

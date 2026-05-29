@@ -306,9 +306,9 @@ class Suggester:
             data = rec.get("data", {})
             if isinstance(data, dict):
                 severity = data.get("severity", "info")
-                context_lines.append(f"[{severity}] {type_}: {data.get('message', rec.get('message', ''))}")
+                context_lines.append(f"[{severity}] {type_}: {data.get('message', rec.get('message', ''))}")  # noqa: E501
             else:
-                context_lines.append(f"{type_}: {str(data)}")
+                context_lines.append(f"{type_}: {data!s}")
 
         context = "\n".join(context_lines)
         suggestions = await self.registry.suggest(context, target)

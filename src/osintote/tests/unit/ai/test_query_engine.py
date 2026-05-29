@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT
 """Unit tests for AI query engine."""
 
-import pytest
 
 from osintote.ai.query_engine import (
     DSLExecutor,
@@ -66,7 +65,8 @@ class TestDSLParser:
 
     def test_parse_complex(self) -> None:
         q = DSLParser.parse(
-            "SELECT severity, message FROM records WHERE severity='critical' ORDER BY severity DESC LIMIT 5"
+            "SELECT severity, message FROM records "
+            "WHERE severity='critical' ORDER BY severity DESC LIMIT 5"
         )
         assert q.table == "records"
         assert q.columns == ["severity", "message"]

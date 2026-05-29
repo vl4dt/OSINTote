@@ -20,7 +20,9 @@ class TestAnalysisResult:
         summary = AISummary(
             risk_score=7.5,
             summary="Test summary",
-            findings=[{"severity": "high", "category": "test", "evidence": "e", "recommendation": "r"}],
+            findings=[
+                {"severity": "high", "category": "test", "evidence": "e", "recommendation": "r"}
+            ],
         )
         result = AnalysisResult(
             summary=summary,
@@ -43,7 +45,7 @@ class TestPromptBuilder:
             target="example.com",
             pruned_context={
                 "records": [
-                    {"type": "port-open", "data": {"severity": "critical", "message": "MySQL on 3306"}},
+                    {"type": "port-open", "data": {"severity": "critical", "message": "MySQL on 3306"}},  # noqa: E501
                     {"type": "port-open", "data": {"severity": "info", "message": "HTTP on 80"}},
                 ],
                 "stats": {"total_records": 2, "unique_targets": 1, "types": {}, "severities": {}},

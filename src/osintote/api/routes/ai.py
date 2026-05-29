@@ -16,10 +16,10 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from osintote.ai.analysis_engine import AnalysisEngine, AnalysisResult
+from osintote.ai.analysis_engine import AnalysisEngine
 from osintote.ai.models import ModelInfo
 from osintote.ai.provider import AIProviderRegistry
-from osintote.ai.query_engine import DSLExecutor, DSLParser, NLFormatter
+from osintote.ai.query_engine import DSLExecutor, DSLParser, DSLQuery, NLFormatter
 from osintote.models.database import get_async_session
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
