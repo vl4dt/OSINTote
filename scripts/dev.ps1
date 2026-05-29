@@ -41,33 +41,33 @@ function Cleanup {
     Write-Host "Done." -ForegroundColor Green
 }
 
+function Start-Backend {
+    Write-Host "Starting backend API server at http://${script:BackendHost}:${script:BackendPort}..." -ForegroundColor Cyan
+    Write-Host "  API docs: http://${script:BackendHost}:${script:BackendPort}/api/docs" -ForegroundColor DarkCyan
+    Write-Host ""
+
+    $script:BackendProcess = Start-Process uv -ArgumentList @(
+        "run", "uvicorn", "osintote.api.app:app",
+        "--reload",
+        "--host", $script:BackendHost,
+        "--port", $script:BackendPort
+    ) -NoNewWindow -PassThru
+
+    Write-Host "  Backend PID: $($script:BackendProcess.Id)" -ForegroundColor Green
+}
+
+function Start-Frontend {
+    Write-Host "Starting frontend dev server at http://localhost:${script:FrontendPort}..." -ForegroundColor Cyan
+    Write-Host ""
+
+    $script:FrontendProcess = Start-Process uv -ArgumentList @(
+        "-C", "frontend", "run", "dev"
+    ) -NoNewWindow -PassThru
+
+    Write-Host "  Frontend PID: $($script:FrontendProcess.Id)" -ForegroundColor Green
+}
+
 try {
-    function Start-Backend {
-        Write-Host "Starting backend API server at http://${script:BackendHost}:${script:BackendPort}..." -ForegroundColor Cyan
-        Write-Host "  API docs: http://${script:BackendHost}:${script:BackendPort}/api/docs" -ForegroundColor DarkCyan
-        Write-Host ""
-
-        $script:BackendProcess = Start-Process uv -ArgumentList @(
-            "run", "uvicorn", "osintote.api.app:app",
-            "--reload",
-            "--host", $script:BackendHost,
-            "--port", $script:BackendPort
-        ) -NoNewWindow -PassThru
-
-        Write-Host "  Backend PID: $($script:BackendProcess.Id)" -ForegroundColor Green
-    }
-
-    function Start-Frontend {
-        Write-Host "Starting frontend dev server at http://localhost:${script:FrontendPort}..." -ForegroundColor Cyan
-        Write-Host ""
-
-        $script:FrontendProcess = Start-Process uv -ArgumentList @(
-            "-C", "frontend", "run", "dev"
-        ) -NoNewWindow -PassThru
-
-        Write-Host "  Frontend PID: $($script:FrontendProcess.Id)" -ForegroundColor Green
-    }
-
     switch ($Mode) {
         "api" {
             Start-Backend
