@@ -21,18 +21,37 @@ from osintote.engine.config import (
     VirusTotalConfig,
     WhoisConfig,
 )
+from osintote.engine.executor import ExecutionEvent, Executor
+from osintote.engine.stage import (
+    STAGE_REGISTRY,
+    FakeStage,
+    Stage,
+    StageContext,
+    StageResult,
+    StageTester,
+    register_stage,
+)
 
 __all__ = [
+    "STAGE_REGISTRY",
     "AIClientConfig",
     "BaseConfig",
     "DNSConfig",
     "EngineConfig",
+    "ExecutionEvent",
+    "Executor",
+    "FakeStage",
     "HTTPConfig",
     "NmapConfig",
     "NucleiConfig",
     "ShodanConfig",
+    "Stage",
+    "StageContext",
+    "StageResult",
+    "StageTester",
     "SubfinderConfig",
     "VirusTotalConfig",
     "WhoisConfig",
     "config",
+    "register_stage",
 ]

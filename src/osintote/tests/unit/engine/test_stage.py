@@ -4,22 +4,20 @@
 
 from __future__ import annotations
 
-import threading
 import time
 
 import pytest
 
 from osintote.engine.stage import (
+    STAGE_REGISTRY,
     FakeStage,
     Stage,
     StageContext,
     StageResult,
     StageTester,
-    register_stage,
-    STAGE_REGISTRY,
     TaskStatus,
+    register_stage,
 )
-
 
 # ── StageResult ──────────────────────────────────────────────────────────────
 
@@ -177,7 +175,9 @@ class ConcreteStage(Stage):
     name = "concrete"
     cost = "light"
 
-    def __init__(self, *, return_success: bool = True, data: Any = None, delay: float = 0.0) -> None:
+    def __init__(
+        self, *, return_success: bool = True, data: Any = None, delay: float = 0.0
+    ) -> None:
         self._success = return_success
         self._data = data
         self._delay = delay
