@@ -1,16 +1,16 @@
-# OSINTOTE � Project Status Map
+# OSINTOTE � Project Status Map
 
 > Last updated: 2026-05-29
 
 ## Summary
 
 ```
-OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++---------- ]  46/57 (80%) | 0 remaining | 0 blocked
+OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++++++++++++------- ]  50/57 (88%) | 0 remaining | 0 blocked
 ```
 
 | Epic | Status | Done/Total | % |
 |------|--------|-----------|---|
-| **Frontend & Reporting (2yq)** | IN PROGRESS | 2/9 | 22% |
+| **Frontend & Reporting (2yq)** | IN PROGRESS | 6/9 | 67% |
 | **Polish & Ship (35e)** | IN PROGRESS | 12/13 | 92% |
 | **Foundation (enz)** | COMPLETE | 9/9 | 100% |
 | **Data Sources & Intelligence (jcz)** | IN PROGRESS | 11/13 | 84% |
@@ -18,21 +18,21 @@ OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++---------- ]  4
 
 ---
 
-## Frontend & Reporting (2yq) � IN PROGRESS
+## Frontend & Reporting (2yq) � IN PROGRESS
 
 | Status | ID | Description |
 |--------|----|-------------|
 | o | OSINTote-2yq | Epic: Intelligence & AI — AI integration, context pruning, report generation, graph, natural language query |
-| o | OSINTote-2yq.8 | AI analysis engine — post-task async analysis, structured output (risk_score, summary, findings array with severity/evidence/recommendation, missing_data), markdown + JSON metadata, CLI: osintote analyze |
 | o | OSINTote-2yq.7 | Context pruning system — auto-summarizer (rule-based stats: domain count, IP count, port count, vuln count), smart context builder (executive summary, top findings, infrastructure, threat intel), token limits (~5K context) |
-| o | OSINTote-2yq.6 | AI query engine — NL→DSL→SQL pipeline, DSL parser/generator, AI intent extraction, SQL translation from DSL, result formatting with natural language summary, /api/ai/query endpoint |
-| o | OSINTote-2yq.5 | AI workflow suggestions — post-task recommendations list, critical finding detection (rule-based patterns: exposed DB, exposed admin, open SSH, default creds), auto-queue follow-up tasks on critical match |
 | x | OSINTote-2yq.3 | Report generation service — Reporter service, JSON export (always available), Markdown export (human-readable with tables/summary/risk score), HTML export (standalone with embedded data + vis.js + vanilla JS interactivity + print CSS) |
 | o | OSINTote-2yq.4 | Relationship graph — vis.js Network with custom theming (node colors/shapes by type, edge labels by relationship type), zoom/pan, click-to-expand, layout toggle (force-directed/hierarchical), filter by type, max 500 nodes |
 | x | OSINTote-2yq.2 | Webhook system — Webhook model, configurable endpoints (/api/webhooks), event triggers (on_task_complete, on_critical_finding), webhook payload structure, CLI add/remove/list, JSON config storage |
-| o | OSINTote-2yq.1 | AI provider abstraction — AIProvider interface (analyze/query/suggest methods), OpenAICompatibleHTTP base class, provider-specific extensions (Ollama, LMStudio, llama.cpp, vLLM), auto-discovery via /v1/models |
+| x | OSINTote-2yq.1 | AI provider abstraction — AIProvider interface (analyze/query/suggest methods), OpenAICompatibleHTTP base class, provider-specific extensions (Ollama, LMStudio, llama.cpp, vLLM), AIProviderRegistry, AI models, provider auto-discovery via /v1/models |
+| x | OSINTote-2yq.5 | AI workflow suggestions — post-task recommendations list, critical finding detection (rule-based patterns: exposed DB, exposed admin, open SSH, default creds), auto-queue follow-up tasks on critical match |
+| x | OSINTote-2yq.6 | AI query engine — NL→DSL→SQL pipeline, DSL parser/generator, AI intent extraction, SQL translation from DSL, result formatting with natural language summary, /api/ai/query endpoint |
+| x | OSINTote-2yq.8 | AI analysis engine — post-task async analysis, structured output (risk_score, summary, findings array with severity/evidence/recommendation, missing_data), markdown + JSON metadata, CLI: osintote analyze |
 
-## Polish & Ship (35e) � IN PROGRESS
+## Polish & Ship (35e) � IN PROGRESS
 
 | Status | ID | Description |
 |--------|----|-------------|
@@ -50,7 +50,7 @@ OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++---------- ]  4
 | x | OSINTote-35e.2 | Desktop notifications — cross-platform notifier (osascript macOS, notify-send Linux, Toast Windows), CLI --notify flag, web UI browser Notification API, osintote settings set notifications true |
 | x | OSINTote-35e.1 | Logging UI — /logs page (collapsible tab), SSE log stream with color-coded severity, search/filter by task/logger/level, auto-scroll, clear button, export log |
 
-## Foundation (enz) � COMPLETE
+## Foundation (enz) � COMPLETE
 
 | Status | ID | Description |
 |--------|----|-------------|
@@ -64,7 +64,7 @@ OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++---------- ]  4
 | x | OSINTote-enz.2 | Engine config — per-source Pydantic BaseSettings (ShodanConfig, CensysConfig, etc.), env var prefix support, CLI flag override, EngineConfig aggregator |
 | x | OSINTote-enz.1 | Project scaffolding — monolithic osintote/ package + frontend/ sibling, pyproject.toml (hatch), Makefile + uv dev workflow, .gitignore, .editorconfig |
 
-## Data Sources & Intelligence (jcz) � IN PROGRESS
+## Data Sources & Intelligence (jcz) � IN PROGRESS
 
 | Status | ID | Description |
 |--------|----|-------------|
@@ -82,7 +82,7 @@ OVERALL  [IN PROGRESS] [ ++++++++++++++++++++++++++++++++++++++++---------- ]  4
 | x | OSINTote-jcz.2 | nmap wrapper — port scanning (-Pn -sV -T timing -p ports), XML output parsing, result normalization to records |
 | x | OSINTote-jcz.1 | DNS enumeration stage — built-in dnspython resolver + subfinder CLI wrapper, recursive enumeration, max depth config, result normalization |
 
-## Pipeline & Engine (yk2) � IN PROGRESS
+## Pipeline & Engine (yk2) � IN PROGRESS
 
 | Status | ID | Description |
 |--------|----|-------------|
