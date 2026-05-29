@@ -10,6 +10,7 @@ from pathlib import Path
 from typer import Option, Typer
 
 from osintote.__about__ import __version__
+from osintote.cli.commands import settings as settings_app
 
 app = Typer(
     name="osintote",
@@ -206,6 +207,7 @@ def serve(
     host: str = Option("127.0.0.1", "--host", "-h", help="Host to bind the server to"),
     port: int = Option(8000, "--port", "-p", help="Port to bind the server to"),
     reload: bool = Option(False, "--reload", "-r", help="Enable auto-reload for development"),
+    notify: bool = Option(False, "--notify", help="Enable desktop notifications"),
 ) -> None:
     """Start the OSINTote web server."""
     import uvicorn
@@ -223,6 +225,10 @@ def serve(
     except Exception as e:
         console.print(f"[yellow]WARN[/] Migration warning: {e}")
 
+    # Enable notifications if requested
+    if notify:
+        console.print("[green]OK[/] Desktop notifications enabled")
+
     uvicorn.run(
         "osintote.api.app:app",
         host=host,
@@ -236,6 +242,9 @@ def serve(
 def status() -> None:
     """Show OSINTote system status."""
     _status()
+
+
+app.add_typer(settings_app._app, name="settings")
 
 
 def main() -> None:

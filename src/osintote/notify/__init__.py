@@ -6,5 +6,6 @@
 from __future__ import annotations
 
 from osintote.notify.notifier import Notifier
+from osintote.notify.platform_notifiers import PlatformNotifier
 
-__all__: list[str] = ["Notifier"]
+__all__: list[str] = ["Notifier", "PlatformNotifier"]

@@ -103,7 +103,7 @@ class Notifier:
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
-            stdout_, stderr = proc.communicate()
+            _stdout, stderr = proc.communicate()
             if proc.returncode == 0:
                 logger.info("Command succeeded: %s", cmd)
                 return True

@@ -3,6 +3,4 @@
 # SPDX-License-Identifier: MIT
 """CLI command modules."""
 
-from . import init, serve, status
-
-__all__ = ["init", "serve", "status"]
+__all__ = ["init", "serve", "settings", "status"]
