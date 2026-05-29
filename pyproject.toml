@@ -38,6 +38,7 @@ dependencies = [
   "aiofiles>=25.1.0",
   "python-dotenv>=1.2.0",
   "cryptography>=45.0.0",
+  "psutil>=7.0.0",
 ]
 
 [project.urls]
