@@ -139,12 +139,12 @@ class Reporter:
             Task data including task info, records, and metadata.
         """
         # Import here to avoid circular imports
-        from sqlmodel import select
+        from sqlmodel import Session, select
 
         from osintote.models.database import get_session
         from osintote.models.orm import Record, Task
 
-        with get_session() as session:
+        with Session(get_session()) as session:
             task = session.get(Task, self.task_id)
             if task is None:
                 raise ValueError(f"Task {self.task_id} not found")
