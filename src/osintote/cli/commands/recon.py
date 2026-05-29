@@ -115,19 +115,13 @@ class ReconDisplay:
                 title="[bold]Findings[/]",
                 pad_edge=True,
             )
-            findings_table.add_column(
-                "[bold]✓[/]", style="green", justify="center"
-            )
+            findings_table.add_column("[bold]✓[/]", style="green", justify="center")
             findings_table.add_column("Type", style="cyan")
             findings_table.add_column("Target", style="dim")
             findings_table.add_column("Details", style="white")
 
             for finding in self.findings:
-                icon = (
-                    "[green]✓[/]"
-                    if finding.get("status") != "warning"
-                    else "[yellow]![/]"
-                )
+                icon = "[green]✓[/]" if finding.get("status") != "warning" else "[yellow]![/]"
                 findings_table.add_row(
                     icon,
                     finding.get("type", "generic"),
@@ -145,9 +139,7 @@ class ReconDisplay:
                 title="[bold]Errors[/]",
                 pad_edge=True,
             )
-            errors_table.add_column(
-                "[bold]✗[/]", style="red", justify="center"
-            )
+            errors_table.add_column("[bold]✗[/]", style="red", justify="center")
             errors_table.add_column("Stage", style="magenta")
             errors_table.add_column("Message", style="red")
 
@@ -161,11 +153,7 @@ class ReconDisplay:
 
         # Summary stats
         total_stages = len(self.stage_tasks)
-        completed_stages = sum(
-            1
-            for task in self.progress.tasks
-            if task.completed
-        )
+        completed_stages = sum(1 for task in self.progress.tasks if task.completed)
         summary_text = (
             f"[bold]Stages:[/]"
             f" [green]{completed_stages}[/] passed / "
@@ -224,12 +212,8 @@ class ReconDisplay:
 
 @app.command("start")
 def recon_start(
-    target_name: str = typer.Argument(
-        ..., help="Target name to run recon against"
-    ),
-    recipe: str | None = typer.Option(
-        None, "-r", "--recipe", help="Recipe identifier"
-    ),
+    target_name: str = typer.Argument(..., help="Target name to run recon against"),
+    recipe: str | None = typer.Option(None, "-r", "--recipe", help="Recipe identifier"),
     name: str = typer.Option("recon", "-n", "--name", help="Task name"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Validate without executing"),
 ) -> None:
@@ -239,9 +223,7 @@ def recon_start(
 
     try:
         with Session(get_session()) as session:
-            target = session.exec(
-                select(Target).where(Target.name == target_name)
-            ).first()
+            target = session.exec(select(Target).where(Target.name == target_name)).first()
             if target is None:
                 console.print(f"[red]Target '{target_name}' not found.[/]")
                 raise typer.Exit(code=1)
@@ -268,9 +250,7 @@ def recon_start(
             stages = _build_stages(recipe)
 
             if dry_run:
-                console.print(
-                    "[blue]--[/] Dry run mode — no stages executed."
-                )
+                console.print("[blue]--[/] Dry run mode — no stages executed.")
                 task.status = TaskStatus.COMPLETED
                 task.completed_at = task.updated_at
                 session.add(task)
@@ -282,9 +262,7 @@ def recon_start(
                 for stage in stages:
                     stage_name = stage.name
                     display.add_stage(stage_name)
-                    display.add_log(
-                        f"[dim]Starting stage:[/dim] {stage_name}"
-                    )
+                    display.add_log(f"[dim]Starting stage:[/dim] {stage_name}")
 
                     try:
                         result = stage.execute(None)
@@ -299,23 +277,13 @@ def recon_start(
                             display.add_finding(finding)
                             display.update_stage(stage_name, advance=1)
 
-                        display.mark_stage_complete(
-                            stage_name, completed=True
-                        )
-                        display.add_log(
-                            f"[green]Stage {stage_name} completed[/]"
-                        )
+                        display.mark_stage_complete(stage_name, completed=True)
+                        display.add_log(f"[green]Stage {stage_name} completed[/]")
 
                     except Exception as exc:
-                        display.mark_stage_complete(
-                            stage_name, completed=False
-                        )
-                        display.add_error(
-                            {"stage": stage_name, "message": str(exc)}
-                        )
-                        display.add_log(
-                            f"[red]Stage {stage_name} failed: {exc}[/]"
-                        )
+                        display.mark_stage_complete(stage_name, completed=False)
+                        display.add_error({"stage": stage_name, "message": str(exc)})
+                        display.add_log(f"[red]Stage {stage_name} failed: {exc}[/]")
 
                 console.print()
                 task.status = TaskStatus.COMPLETED
@@ -336,20 +304,14 @@ def recon_start(
 
 @app.command("list")
 def recon_list(
-    target: str | None = typer.Option(
-        None, "-t", "--target", help="Filter by target"
-    ),
-    status: str | None = typer.Option(
-        None, "-s", "--status", help="Filter by status"
-    ),
+    target: str | None = typer.Option(None, "-t", "--target", help="Filter by target"),
+    status: str | None = typer.Option(None, "-s", "--status", help="Filter by status"),
 ) -> None:
     """List recon tasks with status indicators."""
     with Session(get_session()) as session:
         query = select(Task)
         if target:
-            tgt = session.exec(
-                select(Target).where(Target.name == target)
-            ).first()
+            tgt = session.exec(select(Target).where(Target.name == target)).first()
             if tgt:
                 query = query.where(Task.target_id == tgt.id)
             else:
@@ -357,9 +319,7 @@ def recon_list(
                 raise typer.Exit(code=1)
         if status:
             query = query.where(Task.status == status)
-        tasks = list(
-            session.exec(query.order_by(Task.created_at.desc())).all()
-        )
+        tasks = list(session.exec(query.order_by(Task.created_at.desc())).all())
 
     if not tasks:
         console.print("[blue]--[/] No tasks found.")
@@ -411,19 +371,14 @@ def _load_recipe_stages(recipe_name: str) -> list[Stage]:
     loader = RecipeLoader()
     recipe = loader.get_recipe(recipe_name)
     if recipe is None:
-        console.print(
-            f"[yellow]Recipe '{recipe_name}' not found, "
-            f"using defaults[/]"
-        )
+        console.print(f"[yellow]Recipe '{recipe_name}' not found, using defaults[/]")
         return [FakeStage(success=True, data={}, records_count=0)]
 
     stages: list[Stage] = []
     for stage_def in recipe.ordered_stages():
         stage_cls = STAGE_REGISTRY.get(stage_def.stage)
         if stage_cls is None:
-            console.print(
-                f"[yellow]Unknown stage '{stage_def.stage}', skipping[/]"
-            )
+            console.print(f"[yellow]Unknown stage '{stage_def.stage}', skipping[/]")
             continue
         stages.append(stage_cls(**(stage_def.params or {})))
 

@@ -78,6 +78,15 @@ class TaskStatus(str, PydanticEnum):  # noqa: UP042
     PAUSED = "paused"
 
 
+class ErrorSeverity(str, PydanticEnum):  # noqa: UP042
+    """Error severity tiers — each maps to a UI notification level."""
+
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    CRITICAL = "critical"
+
+
 class LogLevel(str, PydanticEnum):  # noqa: UP042
     """Log severity levels."""
 
@@ -337,9 +346,13 @@ class Error(ModelBase, table=True):
 
     __tablename__ = "errors"
 
-    severity: str = SQLField(
-        index=True,
-        description="Severity level (error, warning, etc.)",
+    severity: ErrorSeverity = SQLField(
+        sa_column=SQLAlchemyEnum(
+            ErrorSeverity,
+            values_callable=lambda x: [e.value for e in x],
+            name="severity",
+        ),
+        description="Severity level (info, warning, error, critical)",
     )
     logger: str = SQLField(index=True, description="Logger name")
     stage: str | None = SQLField(

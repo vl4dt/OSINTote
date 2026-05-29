@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import Any
 
-from ..models.orm import TaskStatus
+from ..models.orm import ErrorSeverity, TaskStatus
 from ..notify.notifier import Notifier
 from .stage import Stage, StageContext, StageResult
 
@@ -481,3 +481,36 @@ class Executor:
     def get_task_results(self, task_id: str) -> list[StageResult] | None:
         """Get results for a completed task."""
         return self._tasks_done.get(task_id)
+
+
+# ── Error Publishing ────────────────────────────────────────────────────────
+
+
+def publish_error_to_sse(
+    severity: ErrorSeverity,
+    message: str,
+    stage: str | None = None,
+    task_id: str | None = None,
+) -> None:
+    """Publish an error to the SSE error stream for real-time delivery.
+
+    The error is published to the queue which is consumed by the
+    /api/errors/stream endpoint.
+    """
+    try:
+        from osintote.api.routes.errors import publish_error as publish_error_fn
+        from osintote.models.orm import Error
+
+        error = Error(
+            severity=severity,
+            message=message,
+            logger="executor",
+            stage=stage,
+            task_id=task_id,
+        )
+        asyncio.run_coroutine_threadsafe(
+            publish_error_fn(error),
+            asyncio.get_running_loop(),
+        )
+    except Exception as exc:
+        logger.warning("Failed to publish error to SSE: %s", exc)

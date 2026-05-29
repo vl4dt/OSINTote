@@ -137,6 +137,4 @@ def recipe_delete(
         recipe_file.unlink()
         console.print(f"[green]OK[/] Recipe '{name}' deleted.")
     else:
-        console.print(
-            f"[yellow]Note:[/] '{name}' is a bundled recipe (cannot delete)."
-        )
+        console.print(f"[yellow]Note:[/] '{name}' is a bundled recipe (cannot delete).")

@@ -193,9 +193,7 @@ class RecipeLoader:
                 self._recipes[recipe.name] = recipe
                 logger.info("Loaded user recipe: %s", recipe.name)
             except Exception as e:
-                logger.warning(
-                    "Failed to load recipe %s: %s", recipe_file.name, e
-                )
+                logger.warning("Failed to load recipe %s: %s", recipe_file.name, e)
 
     def get_recipe(self, name: str) -> Recipe | None:
         """Get a recipe by name (user override takes precedence)."""
